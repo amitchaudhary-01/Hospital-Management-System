@@ -29,4 +29,9 @@ router.delete( "/doctor/:id", isAuthenticated, authorizeRoles("admin"), deleteDo
 
 router.get("/dashboard", isAuthenticated, authorizeRoles("admin"), adminDashboard);
 
+import { getDashboardStats } from "../controllers/admin.controller.js";
+
+router.get( "/dashboard", isAuthenticated, authorizeRoles("admin"),
+    getDashboardStats);
+
 export default router;

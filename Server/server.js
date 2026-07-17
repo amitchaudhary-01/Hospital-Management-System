@@ -6,6 +6,8 @@ import appointmentRoutes from './routes/appointment.routes.js'
 
 import authRoutes from './routes/auth.routes.js'
 import adminRoutes from './routes/admin.routes.js'
+import doctorRoutes from "./routes/doctor.routes.js";
+import patientRoutes from './routes/patient.routes.js'
 import cookieParser from 'cookie-parser';
 
 
@@ -33,6 +35,12 @@ app.use("/api/v1/auth", authRoutes);
 
 /////////admin
 app.use("/api/v1/admin", adminRoutes);
+
+///////doctor
+app.use("/api/v1/doctor", doctorRoutes);
+
+//////patient
+app.use("/api/v1/patient", patientRoutes);
 
 
 

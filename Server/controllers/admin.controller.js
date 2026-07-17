@@ -249,3 +249,52 @@ export const adminDashboard = async (req, res) => {
 
     }
 };
+
+
+export const getDashboardStats = async (req, res) => {
+    try {
+
+        const totalDoctors = await User.countDocuments({ role: "doctor" });
+
+        const totalPatients = await User.countDocuments({ role: "patient" });
+
+        const totalAppointments = await Appointment.countDocuments();
+
+        const pendingAppointments = await Appointment.countDocuments({
+            status: "Pending",
+        });
+
+        const confirmedAppointments = await Appointment.countDocuments({
+            status: "Confirmed",
+        });
+
+        const completedAppointments = await Appointment.countDocuments({
+            status: "Completed",
+        });
+
+        const cancelledAppointments = await Appointment.countDocuments({
+            status: "Cancelled",
+        });
+
+        res.status(200).json({
+            success: true,
+            stats: {
+                totalDoctors,
+                totalPatients,
+                totalAppointments,
+                pendingAppointments,
+                confirmedAppointments,
+                completedAppointments,
+                cancelledAppointments,
+            },
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+
+    }
+};
