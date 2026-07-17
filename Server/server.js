@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.send('API running and connected DB')
+  res.send('API Running and Connected DB')
 })
 
 
