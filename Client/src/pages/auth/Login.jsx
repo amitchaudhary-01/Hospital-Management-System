@@ -31,7 +31,7 @@ const Login = () => {
       setTimeout(() => {
         if (res.user.role === "admin") navigate("/admin");
         else if (res.user.role === "doctor") navigate("/doctor");
-        else navigate("/patient");
+        else navigate("/patient/home");
       }, 1000);
     } catch (error) {
       toast.error(error.response?.data?.message || "Login Failed");
