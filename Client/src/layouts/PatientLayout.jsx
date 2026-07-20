@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { House , CalendarDays } from 'lucide-react';
-
-
+import { House, CalendarDays, User } from 'lucide-react'; // Added User icon
 
 const PatientLayout = () => {
   const { logout, user } = useAuth();
@@ -19,15 +17,18 @@ const PatientLayout = () => {
     {
       name: "Dashboard",
       path: "/patient/home",
-      icon: <House/>
-      
+      icon: <House className="w-4 h-4" />
     },
     {
       name: "My Appointments",
       path: "/patient/appointments",
-      icon: <CalendarDays/>
-      
+      icon: <CalendarDays className="w-4 h-4" />
     },
+    // {
+    //   name: "My Profile", // Added navigation item for profile
+    //   path: "/patient/profile",
+    //   icon: <User className="w-4 h-4" />
+    // },
   ];
 
   return (
@@ -113,15 +114,19 @@ const PatientLayout = () => {
 
         {/* BOTTOM SECTION: USER PROFILE & LOGOUT */}
         <div className="p-3 border-t border-slate-800/80 bg-slate-900 shrink-0 space-y-2 mt-auto sticky bottom-0 z-10">
-          <div className="flex items-center gap-2.5 px-1">
-            <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 font-bold text-xs shrink-0">
+          <NavLink
+            to="/patient/profile"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center gap-2.5 px-1 py-1 rounded-lg hover:bg-slate-800/60 transition group"
+          >
+            <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 font-bold text-xs shrink-0 group-hover:border-sky-500/50">
               {user?.name ? user.name.charAt(0).toUpperCase() : "-"}
             </div>
             <div className="overflow-hidden leading-tight">
-              <p className="text-xs font-semibold text-slate-200 truncate">{user?.name || "------"}</p>
+              <p className="text-xs font-semibold text-slate-200 truncate group-hover:text-sky-400 transition">{user?.name || "------"}</p>
               <p className="text-[11px] text-slate-400 truncate">{user?.email || "------@care.com"}</p>
             </div>
-          </div>
+          </NavLink>
 
           <button
             onClick={handleLogout}

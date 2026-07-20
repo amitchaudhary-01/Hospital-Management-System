@@ -5,6 +5,7 @@ import PatientLayout from "../layouts/PatientLayout";
 import PatientHome from "../pages/patient/PatientHome";
 import Appointment from "../pages/patient/Appointment"; // Using your file from earlier steps
 import BookAppointment from "../pages/patient/BookAppointment";
+import PatientProfile from "../pages/patient/PatientProfile";
 
 const AppRoutes = () => {
   return (
@@ -25,6 +26,8 @@ const AppRoutes = () => {
         <Route path="appointments" element={<Appointment />} />
        
         <Route path="/patient/book/:doctorId" element={<BookAppointment />} />
+
+        <Route path="profile" element={<PatientProfile />} /> 
 
         
       </Route>

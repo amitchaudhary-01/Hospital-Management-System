@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../api/axios";
-import { Search } from 'lucide-react';
-import { CalendarDays } from 'lucide-react';
+import { Search, CalendarDays } from 'lucide-react';
 
 const PatientHome = () => {
   const navigate = useNavigate();
@@ -17,7 +16,6 @@ const PatientHome = () => {
         setLoading(true);
         setError("");
 
-        
         const response = await API.get("/patient/doctors", {
           withCredentials: true,
         });
@@ -95,12 +93,18 @@ const PatientHome = () => {
           className="group bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-emerald-300 transition-all duration-300 cursor-pointer flex items-start gap-5"
         >
           <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-xl font-bold group-hover:bg-emerald-600 group-hover:text-white transition-colors shrink-0">
-             <Search />
+            <Search />
           </div>
           <div className="flex-1">
-            <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
-              Find a Specialist
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+                Find a Specialist
+              </h3>
+              {/* Doctor count badge on card */}
+              <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                {loading ? "..." : `${doctors.length} Available`}
+              </span>
+            </div>
             <p className="text-slate-500 text-xs mt-1 leading-relaxed">
               Explore our directory of verified practitioners and lock in your slot.
             </p>
@@ -115,8 +119,20 @@ const PatientHome = () => {
       <section id="explore-doctors" className="space-y-6 pt-4 scroll-mt-20">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Available Medical Specialists</h2>
-            <p className="text-slate-500 text-xs mt-0.5">Select a practitioner to schedule a consultation.</p>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                Available Medical Specialists
+              </h2>
+              {/* Doctor count badge next to section heading */}
+              <span className="bg-sky-100 text-sky-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-sky-200">
+                {loading ? "..." : `${filteredDoctors.length} ${filteredDoctors.length === 1 ? 'Doctor' : 'Doctors'}`}
+              </span>
+            </div>
+            <p className="text-slate-500 text-xs mt-0.5">
+              {searchQuery
+                ? `Showing ${filteredDoctors.length} of ${doctors.length} available doctors`
+                : "Select a practitioner to schedule a consultation."}
+            </p>
           </div>
 
           {/* Search Bar Input */}
