@@ -1,82 +1,42 @@
-// import jwt from "jsonwebtoken";
-// import { User } from "../schemas/user.Schema.js";
-
-// export const isAuthenticated = async (req, res, next) => {
-//   try {
-//     // 1. Safe extraction in case req.cookies is undefined
-//     const token = req.cookies?.token;
-
-//     if (!token) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Please login first.",
-//       });
-//     }
-
-//     // 2. Verify the token
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-//     // 3. Handle the edge case where the user was deleted from the DB but has a valid token
-//     const user = await User.findById(decoded.id);
-//     if (!user) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "User no longer exists.",
-//       });
-//     }
-
-//     req.user = user;
-//     next();
-//   } catch (error) {
-//     return res.status(401).json({
-//       success: false,
-//       message: "Invalid or expired token.",
-//     });
-//   }
-// };
-
-
 import jwt from "jsonwebtoken";
-import { User } from "../schemas/user.Schema.js"; // change if you renamed schemas to models
+import { User } from "../schemas/user.Schema.js";
 
 export const isAuthenticated = async (req, res, next) => {
-    try {
+  try {
+    // 1. Extract token from Cookie or Bearer Header
+    let token = req.cookies?.token;
 
-        // Get token from cookie or Authorization header
-        const token =
-            req.cookies?.token ||
-            req.headers.authorization?.split(" ")[1];
-
-        // If token not found
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: "Please login first."
-            });
-        }
-
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Find user
-        const user = await User.findById(decoded.id).select("-password");
-
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: "User not found."
-            });
-        }
-
-        // Attach user to request
-        req.user = user;
-
-        next();
-
-    } catch (error) {
-        return res.status(401).json({
-            success: false,
-            message: "Invalid or expired token."
-        });
+    if (!token && req.headers.authorization?.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
     }
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required. Please log in.",
+      });
+    }
+
+    // 2. Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 3. Retrieve user (exclude password hash)
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User account no longer exists.",
+      });
+    }
+
+    // 4. Attach user to request & proceed
+    req.user = user;
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired token.",
+    });
+  }
 };

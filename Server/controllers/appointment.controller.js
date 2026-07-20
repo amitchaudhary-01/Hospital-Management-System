@@ -4,7 +4,7 @@ import { User } from "../schemas/user.Schema.js";
 export const bookAppointment = async (req, res) => {
     try {
 
-        const { doctor, date, timeSlot, reason } = req.body;
+        const { doctor, date, timeSlot, reason , specialization} = req.body;
 
         // Validation
         if (!doctor || !date || !timeSlot) {
@@ -33,7 +33,8 @@ export const bookAppointment = async (req, res) => {
             doctor,
             date,
             timeSlot,
-            reason
+            reason,
+            specialization
             // status defaults to "Pending"
         });
 
@@ -55,7 +56,36 @@ export const bookAppointment = async (req, res) => {
 
 
 
-export const getMyAppointments = async (req, res) => {};
+export const getMyAppointments = async (req, res) => {
+  try {
+    // 1. Check if user is attached by auth middleware
+    if (!req.user?._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: User information missing.",
+      });
+    }
+
+    // 2. Fetch and populate appointments
+    const appointments = await Appointment.find({ patient: req.user._id })
+      .populate("doctor", "name email contactNumber address specialization")
+      .sort({ createdAt: -1 })
+      .lean(); // Converts Mongoose Documents to plain JS objects (faster performance)
+
+    // 3. Optional: Filter out or handle missing doctor populates safely
+    return res.status(200).json({
+      success: true,
+      count: appointments.length,
+      appointments,
+    });
+  } catch (error) {
+    console.error("Error in getMyAppointments:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to retrieve appointments.",
+    });
+  }
+};
 
 export const getDoctorAppointments = async (req, res) => {};
 

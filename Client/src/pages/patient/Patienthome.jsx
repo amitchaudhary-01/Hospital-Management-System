@@ -1,24 +1,26 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../api/axios";
+import { Search } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 
 const PatientHome = () => {
   const navigate = useNavigate();
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
         setError("");
+
         
         const response = await API.get("/patient/doctors", {
-          withCredentials: true 
+          withCredentials: true,
         });
-        
-        console.log("Backend Response payload:", response.data);
 
         if (response.data && response.data.doctors) {
           setDoctors(response.data.doctors);
@@ -38,133 +40,170 @@ const PatientHome = () => {
     fetchDoctors();
   }, []);
 
-  return (
-    <div className="relative min-h-screen bg-slate-50 px-6 py-12 max-w-6xl mx-auto overflow-hidden text-slate-800">
-      {/* Soft Bright Background Glows */}
-      <div className="absolute top-[-100px] left-[-100px] w-96 h-96 bg-sky-200/60 blur-[120px] rounded-full pointer-events-none"></div>
-      <div className="absolute top-[200px] right-[-100px] w-96 h-96 bg-cyan-200/50 blur-[120px] rounded-full pointer-events-none"></div>
+  const filteredDoctors = doctors.filter(
+    (doc) =>
+      doc.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.specialization?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-      {/* Welcome Hero Section */}
-      <div className="mb-12 text-center md:text-left relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-sky-700 text-xs font-semibold mb-4">
-          <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
-          Patient Portal Active
+  return (
+    <div className="space-y-8">
+      {/* Welcome Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600 to-indigo-700 text-white p-8 md:p-10 shadow-lg shadow-sky-600/10">
+        <div className="relative z-10 max-w-2xl space-y-3">
+          <span className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-sky-100 border border-white/20">
+            Healthcare Dashboard
+          </span>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight">
+            Welcome back to your health hub
+          </h1>
+          <p className="text-sky-100 text-sm leading-relaxed">
+            Manage consultations, search specialist directories, and monitor your appointments easily.
+          </p>
         </div>
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
-          Hello, Welcome <span className="text-sky-600">Back</span>
-        </h1>
-        <p className="text-slate-600 mt-2 text-sm md:text-base max-w-2xl">
-          Manage your health profile, consult specialists, and coordinate your upcoming hospital appointments seamlessly.
-        </p>
+        {/* Subtle Decorative Pattern */}
+        <div className="absolute right-[-40px] bottom-[-40px] w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none" />
       </div>
 
-      {/* QUICK ACTIONS SECTION */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 relative z-10">
-        {/* Card 1: View Appointments */}
-        <div 
+      {/* Quick Action Navigation Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div
           onClick={() => navigate("/patient/appointments")}
-          className="bg-white border border-slate-200/80 p-8 rounded-2xl shadow-sm hover:shadow-xl hover:border-sky-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+          className="group bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-sky-300 transition-all duration-300 cursor-pointer flex items-start gap-5"
         >
-          <div className="w-12 h-12 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 mb-4 text-xl font-bold group-hover:scale-110 transition-transform">
-            📅
+          <div className="w-12 h-12 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 text-xl font-bold group-hover:bg-sky-600 group-hover:text-white transition-colors shrink-0">
+            <CalendarDays />
           </div>
-          <h3 className="text-xl font-bold mb-2 text-slate-900">My Appointments</h3>
-          <p className="text-slate-500 text-xs leading-relaxed">
-            Review your historical visits, check real-time status updates on active bookings, or cancel scheduled slots.
-          </p>
-          <span className="text-xs text-sky-600 font-bold inline-block mt-4 tracking-wider group-hover:translate-x-1 transition-transform">
-            Open Dashboard →
-          </span>
+          <div className="flex-1">
+            <h3 className="text-base font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+              My Appointments
+            </h3>
+            <p className="text-slate-500 text-xs mt-1 leading-relaxed">
+              Check scheduled visits, review updates, or cancel active bookings.
+            </p>
+            <span className="text-xs text-sky-600 font-bold inline-flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
+              View Schedule →
+            </span>
+          </div>
         </div>
 
-        {/* Card 2: Explore Doctors */}
-        <div 
+        <div
           onClick={() => {
             const element = document.getElementById("explore-doctors");
             element?.scrollIntoView({ behavior: "smooth" });
           }}
-          className="bg-white border border-slate-200/80 p-8 rounded-2xl shadow-sm hover:shadow-xl hover:border-emerald-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+          className="group bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-emerald-300 transition-all duration-300 cursor-pointer flex items-start gap-5"
         >
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mb-4 text-xl font-bold group-hover:scale-110 transition-transform">
-            🔍
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-xl font-bold group-hover:bg-emerald-600 group-hover:text-white transition-colors shrink-0">
+             <Search />
           </div>
-          <h3 className="text-xl font-bold mb-2 text-slate-900">Find a Specialist</h3>
-          <p className="text-slate-500 text-xs leading-relaxed">
-            Browse through available institutional practitioners grouped comprehensively by clinical medical specializations.
-          </p>
-          <span className="text-xs text-emerald-600 font-bold inline-block mt-4 tracking-wider group-hover:translate-x-1 transition-transform">
-            Explore Doctors ↓
-          </span>
+          <div className="flex-1">
+            <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+              Find a Specialist
+            </h3>
+            <p className="text-slate-500 text-xs mt-1 leading-relaxed">
+              Explore our directory of verified practitioners and lock in your slot.
+            </p>
+            <span className="text-xs text-emerald-600 font-bold inline-flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
+              Browse Doctors ↓
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* EXPLORE DOCTORS DIRECTORY */}
-      <section id="explore-doctors" className="pt-6 scroll-mt-24 relative z-10">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-            Our Medical <span className="text-sky-600">Specialists</span>
-          </h2>
-          <p className="text-slate-500 text-xs mt-1">Select a verified professional to lock in your preferred schedule slot.</p>
+      {/* Doctor Directory Section */}
+      <section id="explore-doctors" className="space-y-6 pt-4 scroll-mt-20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Available Medical Specialists</h2>
+            <p className="text-slate-500 text-xs mt-0.5">Select a practitioner to schedule a consultation.</p>
+          </div>
+
+          {/* Search Bar Input */}
+          <div className="relative w-full sm:w-72">
+            <input
+              type="text"
+              placeholder="Search by name or specialty..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 transition shadow-xs"
+            />
+            <svg
+              className="w-4 h-4 text-slate-400 absolute left-3 top-2.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
         </div>
 
         {/* Error State */}
         {error && (
-          <div className="text-sm text-red-700 bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-2 mb-6">
+          <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 p-4 rounded-xl flex items-center gap-2">
             <span>⚠️</span> {error}
           </div>
         )}
 
-        {/* Empty Database State */}
-        {!loading && !error && doctors.length === 0 && (
-          <div className="text-sm text-slate-500 bg-white border border-slate-200 p-8 rounded-xl text-center shadow-sm">
-            No doctors found in the system matching the criteria.
+        {/* Empty State */}
+        {!loading && !error && filteredDoctors.length === 0 && (
+          <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl shadow-xs">
+            <p className="text-sm font-semibold text-slate-700">No doctors found</p>
+            <p className="text-xs text-slate-400 mt-1">Try adjusting your search criteria or clear the search field.</p>
           </div>
         )}
 
-        {/* Doctor Render Grid & Skeleton Loading State */}
+        {/* Doctors Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Skeleton Loaders (Rendered while fetching data) */}
+          {/* Skeleton Loaders */}
           {loading &&
             Array.from({ length: 6 }).map((_, idx) => (
-              <div 
-                key={idx} 
-                className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm animate-pulse flex flex-col justify-between min-h-[200px]"
+              <div
+                key={idx}
+                className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs animate-pulse flex flex-col justify-between h-56"
               >
                 <div>
-                  {/* Badge Skeleton */}
-                  <div className="w-24 h-5 bg-slate-200 rounded-full"></div>
-                  {/* Doctor Name Skeleton */}
-                  <div className="w-3/4 h-6 bg-slate-200 rounded-md mt-4"></div>
-                  {/* Email Skeleton */}
-                  <div className="w-1/2 h-3 bg-slate-200 rounded-md mt-2"></div>
-                  {/* Address Skeleton */}
-                  <div className="w-2/3 h-3 bg-slate-200 rounded-md mt-3"></div>
+                  <div className="w-24 h-5 bg-slate-200 rounded-full" />
+                  <div className="w-3/4 h-5 bg-slate-200 rounded-md mt-4" />
+                  <div className="w-1/2 h-3 bg-slate-200 rounded-md mt-2" />
                 </div>
-
-                {/* Button Skeleton */}
-                <div className="w-full h-9 bg-slate-200 rounded-xl mt-6"></div>
+                <div className="w-full h-9 bg-slate-200 rounded-xl" />
               </div>
             ))}
 
-          {/* Actual Doctor Cards */}
-          {!loading && !error && doctors.length > 0 &&
-            doctors.map((doc) => (
-              <div 
-                key={doc._id} 
-                className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-sky-200 transition-all duration-300 flex flex-col justify-between min-h-[200px]"
+          {/* Rendered Doctor Cards */}
+          {!loading &&
+            !error &&
+            filteredDoctors.map((doc) => (
+              <div
+                key={doc._id}
+                className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs hover:shadow-lg hover:border-sky-300 transition-all duration-300 flex flex-col justify-between group"
               >
-                <div>
-                  <span className="bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full inline-block">
-                    {doc.specialization || "General Medicine"}
-                  </span>
-                  <h4 className="text-lg font-bold mt-3 text-slate-900 tracking-tight">{doc.name}</h4>
-                  <p className="text-slate-500 text-xs mt-0.5">{doc.email}</p>
-                  {doc.address && <p className="text-slate-600 text-[11px] mt-2 flex items-center gap-1">📍 {doc.address}</p>}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full">
+                      {doc.specialization || "General Medicine"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+                      {doc.name}
+                    </h4>
+                    <p className="text-slate-500 text-xs mt-0.5">{doc.email}</p>
+                  </div>
+
+                  {doc.address && (
+                    <p className="text-slate-500 text-xs flex items-center gap-1.5 pt-1 border-t border-slate-100">
+                      <span>📍</span> <span className="truncate">{doc.address}</span>
+                    </p>
+                  )}
                 </div>
 
-                <button 
+                <button
                   onClick={() => navigate(`/patient/book/${doc._id}`)}
-                  className="w-full mt-6 bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20 text-xs font-bold py-2.5 px-4 rounded-xl transition-all duration-200 tracking-wider uppercase cursor-pointer"
+                  className="w-full mt-6 bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all duration-200 tracking-wider uppercase cursor-pointer shadow-xs"
                 >
                   Request Consultation
                 </button>
