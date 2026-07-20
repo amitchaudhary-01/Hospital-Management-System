@@ -11,9 +11,9 @@ const PatientLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#081215] text-white font-sans flex flex-col">
+    <div className="min-h-screen bg-[#0877f5] text-white font-sans flex flex-col">
       {/* Universal Patient Navbar */}
-      <nav className="bg-[#111e22]/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+      <nav className="bg-[#0877f5]/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
         <Link to="/patient/home" className="text-xl font-bold tracking-wide">
           Hospital <span className="text-[#00ffc3]">Care</span>
         </Link>
@@ -23,7 +23,7 @@ const PatientLayout = () => {
           <Link to="/patient/appointments" className="text-gray-300 hover:text-[#00ffc3] transition">My Appointments</Link>
           <button 
             onClick={handleLogout}
-            className="border border-red-500/30 text-red-400 px-4 py-1.5 rounded-lg hover:bg-red-500/10 transition text-xs uppercase font-bold tracking-wider cursor-pointer"
+            className="border bg-red-600 hover:bg-red-700 border-red-500/30 text-white px-4 py-1.5 rounded-lg transition text-xs uppercase font-bold tracking-wider cursor-pointer"
           >
             Logout
           </button>

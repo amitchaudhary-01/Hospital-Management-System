@@ -46,6 +46,11 @@ const Login = () => {
       {/* Background Animated Blobs for Depth */}
       <div className="absolute top-[-150px] left-[-150px] w-[500px] h-[500px] rounded-full bg-[#00ffc3] opacity-10 blur-[120px] pointer-events-none animate-pulse"></div>
       <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full bg-[#00c3a0] opacity-5 blur-[100px] pointer-events-none"></div>
+      <div className="absolute top-[-150px] right-[-150px] w-[500px] h-[500px] rounded-full bg-[#00ffc3] opacity-10 blur-[120px] pointer-events-none animate-pulse"></div>
+      <div className="absolute bottom-[-150px] left-[-150px] w-[500px] h-[500px] rounded-full bg-[#00ffc3] opacity-10 blur-[120px] pointer-events-none animate-pulse"></div>
+      <div className="absolute bottom-[-150px] right-[-150px] w-[500px] h-[500px] rounded-full bg-[#00ffc3] opacity-10 blur-[120px] pointer-events-none animate-pulse"></div>
+
+
 
       {/* Main Glassmorphic Container Card */}
       <div className="relative w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 bg-[#111e22]/50 backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden m-4 min-h-[550px]">
