@@ -4,6 +4,7 @@ import SignUp from "../pages/auth/SignUp";
 import PatientLayout from "../layouts/PatientLayout";
 import PatientHome from "../pages/patient/PatientHome";
 import Appointment from "../pages/patient/Appointment"; // Using your file from earlier steps
+import BookAppointment from "../pages/patient/BookAppointment";
 
 const AppRoutes = () => {
   return (
@@ -22,6 +23,10 @@ const AppRoutes = () => {
         
         {/* This maps the "/patient/appointments" path */}
         <Route path="appointments" element={<Appointment />} />
+       
+        <Route path="/patient/book/:doctorId" element={<BookAppointment />} />
+
+        
       </Route>
 
       {/* Catch-all fallback if someone types a broken URL */}

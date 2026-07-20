@@ -4,7 +4,7 @@ import { User } from "../schemas/user.Schema.js";
 export const bookAppointment = async (req, res) => {
     try {
 
-        const { doctor, date, timeSlot, reason , specialization} = req.body;
+        const { doctor, date, timeSlot, reason , /*specialization*/} = req.body;
 
         // Validation
         if (!doctor || !date || !timeSlot) {
@@ -27,14 +27,29 @@ export const bookAppointment = async (req, res) => {
             });
         }
 
+        // Check if doctor is already booked for this slot
+        const existingSlot = await Appointment.findOne({
+            doctor,
+            date,
+            timeSlot,
+            status: { $ne: "Cancelled" } // Ignore cancelled slots
+        });
+
+        if (existingSlot) {
+           return res.status(400).json({
+           success: false,
+           message: "This doctor is already booked for the selected date and time slot."
+        });
+        }
+
         // Create appointment
         const appointment = await Appointment.create({
             patient: req.user._id,
             doctor,
             date,
             timeSlot,
-            reason,
-            specialization
+            reason
+            /*specialization*/
             // status defaults to "Pending"
         });
 

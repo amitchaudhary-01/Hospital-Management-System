@@ -39,7 +39,7 @@ const PatientLayout = () => {
             HC
           </div>
           <span className="font-bold text-lg tracking-tight">
-            Hospital <span className="text-sky-400">Care</span>
+            Hospital <span className="text-sky-400">Care.</span>
           </span>
         </div>
         <button
