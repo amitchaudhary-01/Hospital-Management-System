@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Login = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lampOn, setLampOn] = useState(false); // Controls the light and form visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -30,7 +32,7 @@ const Login = () => {
 
       setTimeout(() => {
         if (res.user.role === "admin") navigate("/admin");
-        else if (res.user.role === "doctor") navigate("/doctor");
+        else if (res.user.role === "doctor") navigate("/doctor/dashboard");
         else navigate("/patient/home");
       }, 1000);
     } catch (error) {
@@ -168,31 +170,52 @@ const Login = () => {
               </div>
 
               {/* Password Input Field */}
-              <div>
-                <label className="block text-xs font-semibold text-[#00ffc3] tracking-widest uppercase mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  tabIndex={lampOn ? 0 : -1}
-                  className={`w-full bg-[#0d171a]/80 text-white px-4 py-3 rounded-xl border outline-none transition-all duration-300 ${
-                    errors.password
-                      ? "border-red-500 focus:border-red-500"
-                      : "border-gray-800 focus:border-[#00ffc3] focus:shadow-[0_0_10px_rgba(0,255,195,0.15)]"
-                  }`}
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  })}
-                />
-                {errors.password && (
-                  <p className="text-red-400 text-xs mt-1.5">{errors.password.message}</p>
-                )}
-              </div>
+             {/* Password Input Field */}
+<div>
+  <label className="block text-xs font-semibold text-[#00ffc3] tracking-widest uppercase mb-2">
+    Password
+  </label>
+
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder="••••••••"
+      tabIndex={lampOn ? 0 : -1}
+      className={`w-full bg-[#0d171a]/80 text-white pl-4 pr-12 py-3 rounded-xl border outline-none transition-all duration-300 ${
+        errors.password
+          ? "border-red-500 focus:border-red-500"
+          : "border-gray-800 focus:border-[#00ffc3] focus:shadow-[0_0_10px_rgba(0,255,195,0.15)]"
+      }`}
+      {...register("password", {
+        required: "Password is required",
+        minLength: {
+          value: 6,
+          message: "Password must be at least 6 characters",
+        },
+      })}
+    />
+
+    {/* Eye Button */}
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00ffc3] transition-colors"
+      tabIndex={lampOn ? 0 : -1}
+    >
+      {showPassword ? (
+        <EyeOff size={20} />
+      ) : (
+        <Eye size={20} />
+      )}
+    </button>
+  </div>
+
+  {errors.password && (
+    <p className="text-red-400 text-xs mt-1.5">
+      {errors.password.message}
+    </p>
+  )}
+</div>
 
               {/* Submit Sign In Button */}
               <button
@@ -214,10 +237,10 @@ const Login = () => {
             {/* Social Authentication buttons matches image layout */}
             <div className="grid grid-cols-2 gap-4">
               <button type="button" tabIndex={lampOn ? 0 : -1} className="flex items-center justify-center gap-2 bg-[#0d171a] border border-gray-800 text-gray-300 py-2.5 rounded-xl text-sm hover:border-gray-700 transition">
-                <span>Google</span>
+                <Link to="www.google.com">Google</Link>
               </button>
               <button type="button" tabIndex={lampOn ? 0 : -1} className="flex items-center justify-center gap-2 bg-[#0d171a] border border-gray-800 text-gray-300 py-2.5 rounded-xl text-sm hover:border-gray-700 transition">
-                <span>GitHub</span>
+                <Link>GitHub</Link>
               </button>
             </div>
 

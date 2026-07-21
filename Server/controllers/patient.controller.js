@@ -50,7 +50,7 @@ export const getPatientProfile = async (req, res) => {
 // PUT /api/patient/profile
 export const updatePatientProfile = async (req, res) => {
   try {
-    const { name, phone, address, age, gender, bloodGroup } = req.body;
+    const { name,email, phone, address, age, gender, bloodGroup } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,

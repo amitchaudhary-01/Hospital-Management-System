@@ -102,9 +102,110 @@ export const getMyAppointments = async (req, res) => {
   }
 };
 
-export const getDoctorAppointments = async (req, res) => {};
+export const getDoctorAppointments = async (req, res) => {
+    try {
 
-export const updateAppointmentStatus = async (req, res) => {};
+        const appointments = await Appointment.find({
+            doctor: req.user.id,
+        })
+            .populate("patient", "name email contactNumber address")
+            .sort({ date: 1 });
+
+        return res.status(200).json({
+            success: true,
+            appointments,
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+
+    }
+};
+
+
+
+// Valid status options and allowed transitions
+const ALLOWED_STATUSES = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"];
+
+export const updateAppointmentStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const userId = req.user._id; // Set by isAuthenticated middleware
+    const userRole = req.user.role;
+
+    // 1. Validate payload
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: "Status is required.",
+      });
+    }
+
+    const normalizedStatus = status.toUpperCase();
+    if (!ALLOWED_STATUSES.includes(normalizedStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Allowed values: ${ALLOWED_STATUSES.join(", ")}`,
+      });
+    }
+
+    // 2. Fetch the appointment first to check ownership and state
+    const appointment = await Appointment.findById(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found.",
+      });
+    }
+
+    // 3. Ownership Check: If doctor, make sure this appointment belongs to them
+    if (userRole === "doctor" && appointment.doctor.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden. You can only update your own appointments.",
+      });
+    }
+
+    // 4. State Validation: Prevent modifying already finished/cancelled appointments
+    if (["CANCELLED", "COMPLETED"].includes(appointment.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot change status of an appointment that is already ${appointment.status.toLowerCase()}.`,
+      });
+    }
+
+    // 5. Perform update
+    appointment.status = normalizedStatus;
+    await appointment.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Appointment status updated to ${normalizedStatus}.`,
+      data: appointment,
+    });
+
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+
+    if (error.kind === "ObjectId") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid appointment ID format.",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while updating appointment status.",
+    });
+  }
+};
 
 export const addPrescription = async (req, res) => {};
 
