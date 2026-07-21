@@ -52,7 +52,7 @@ const Appointments = () => {
 
 const handleStatusUpdate = async (appointmentId, newStatus) => {
     try {
-      await API.patch(`/appointments/:id/status/${appointmentId}/status`,
+      await API.patch(`/appointments/${appointmentId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );

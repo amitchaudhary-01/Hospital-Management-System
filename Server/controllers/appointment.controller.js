@@ -128,14 +128,14 @@ export const getDoctorAppointments = async (req, res) => {
 
 
 
-// Valid status options and allowed transitions
-const ALLOWED_STATUSES = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"];
+// Keep allowed statuses matching your Mongoose Schema exactly
+const ALLOWED_STATUSES = ["Pending", "Confirmed", "Cancelled", "Completed"];
 
 export const updateAppointmentStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const userId = req.user._id; // Set by isAuthenticated middleware
+    const userId = req.user._id;
     const userRole = req.user.role;
 
     // 1. Validate payload
@@ -146,8 +146,11 @@ export const updateAppointmentStatus = async (req, res) => {
       });
     }
 
-    const normalizedStatus = status.toUpperCase();
-    if (!ALLOWED_STATUSES.includes(normalizedStatus)) {
+    // Format input to Title Case (e.g. "confirmed" or "CONFIRMED" -> "Confirmed")
+    const formattedStatus =
+      status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+
+    if (!ALLOWED_STATUSES.includes(formattedStatus)) {
       return res.status(400).json({
         success: false,
         message: `Invalid status. Allowed values: ${ALLOWED_STATUSES.join(", ")}`,
@@ -165,7 +168,10 @@ export const updateAppointmentStatus = async (req, res) => {
     }
 
     // 3. Ownership Check: If doctor, make sure this appointment belongs to them
-    if (userRole === "doctor" && appointment.doctor.toString() !== userId.toString()) {
+    if (
+      userRole?.toLowerCase() === "doctor" &&
+      appointment.doctor.toString() !== userId.toString()
+    ) {
       return res.status(403).json({
         success: false,
         message: "Forbidden. You can only update your own appointments.",
@@ -173,7 +179,7 @@ export const updateAppointmentStatus = async (req, res) => {
     }
 
     // 4. State Validation: Prevent modifying already finished/cancelled appointments
-    if (["CANCELLED", "COMPLETED"].includes(appointment.status)) {
+    if (["Cancelled", "Completed"].includes(appointment.status)) {
       return res.status(400).json({
         success: false,
         message: `Cannot change status of an appointment that is already ${appointment.status.toLowerCase()}.`,
@@ -181,19 +187,18 @@ export const updateAppointmentStatus = async (req, res) => {
     }
 
     // 5. Perform update
-    appointment.status = normalizedStatus;
+    appointment.status = formattedStatus;
     await appointment.save();
 
     return res.status(200).json({
       success: true,
-      message: `Appointment status updated to ${normalizedStatus}.`,
+      message: `Appointment status updated to ${formattedStatus}.`,
       data: appointment,
     });
-
   } catch (error) {
     console.error("Error updating appointment status:", error);
 
-    if (error.kind === "ObjectId") {
+    if (error.name === "CastError" || error.kind === "ObjectId") {
       return res.status(400).json({
         success: false,
         message: "Invalid appointment ID format.",

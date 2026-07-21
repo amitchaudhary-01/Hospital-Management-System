@@ -22,7 +22,7 @@ router.get("/my", isAuthenticated, authorizeRoles("patient"), getMyAppointments)
 /* ---------- Doctor ---------- */
 router.get("/doctor", isAuthenticated, authorizeRoles("doctor"), getDoctorAppointments);
 
-router.put("/:id/status", isAuthenticated, authorizeRoles("doctor","admin"), updateAppointmentStatus);
+router.patch("/:id/status", isAuthenticated, authorizeRoles("doctor","admin"), updateAppointmentStatus);
 
 router.put("/:id/prescription", isAuthenticated, authorizeRoles("doctor"),
     addPrescription);
