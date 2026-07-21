@@ -25,7 +25,7 @@ const SignUp = () => {
         password: data.password,
         contactNumber: data.contactNumber,
         gender: data.gender,
-        bloodGroup: data.bloodGroup,
+        BloodGroup: data.BloodGroup,
         address: data.address,
       });
 
@@ -276,7 +276,7 @@ const SignUp = () => {
                       ? "border-red-500 focus:border-red-500"
                       : "border-gray-800 focus:border-[#00ffc3]"
                   }`}
-                  {...register("bloodGroup", {
+                  {...register("BloodGroup", {
                     required: "Blood Group is required",
                   })}
                 >
