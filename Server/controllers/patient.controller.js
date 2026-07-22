@@ -1,6 +1,6 @@
 import { Appointment } from "../schemas/appointment.Schema.js";
 import { User } from "../schemas/user.Schema.js";
-
+import { Prescription } from "../schemas/prescription.Schema.js";
 
 
 export const getAllDoctors = async (req, res) => {
@@ -75,6 +75,41 @@ export const updatePatientProfile = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: error.message || "Failed to update profile.",
+    });
+  }
+};
+
+// GET /api/patient/prescriptions
+export const getMyPrescriptions = async (req, res) => {
+  try {
+    const prescriptions = await Prescription.find({
+      patient: req.user._id,
+    })
+      .populate(
+        "doctor",
+        "name specialization contactNumber"
+      )
+      .populate(
+        "appointment",
+        "date timeSlot status"
+      )
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      prescriptions,
+    });
+  } catch (error) {
+    console.error(
+      "Get Patient Prescriptions Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        error.message ||
+        "Failed to fetch prescriptions.",
     });
   }
 };

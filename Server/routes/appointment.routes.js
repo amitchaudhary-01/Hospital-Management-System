@@ -24,8 +24,8 @@ router.get("/doctor", isAuthenticated, authorizeRoles("doctor"), getDoctorAppoin
 
 router.patch("/:id/status", isAuthenticated, authorizeRoles("doctor","admin"), updateAppointmentStatus);
 
-router.put("/:id/prescription", isAuthenticated, authorizeRoles("doctor"),
-    addPrescription);
+// router.put("/:id/prescription", isAuthenticated, authorizeRoles("doctor"),
+//     addPrescription);
 
 /* ---------- Admin ---------- */
 router.get("/", isAuthenticated, authorizeRoles("admin"),

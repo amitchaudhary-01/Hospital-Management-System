@@ -188,6 +188,7 @@ const handleStatusUpdate = async (appointmentId, newStatus) => {
                     >
                       <XCircle className="w-3.5 h-3.5" /> Cancel
                     </button>
+                    
                   </div>
                 )}
               </div>

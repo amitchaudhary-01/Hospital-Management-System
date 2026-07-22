@@ -60,49 +60,61 @@ import { Appointment } from "../schemas/appointment.Schema.js";
 
 
 // export const writePrescription = async (req, res) => {
-//     try {
+//   try {
+//     const { id } = req.params;
+//     const { medicines, notes } = req.body;
 
-//         const { id } = req.params;
-//         const { medicines, notes } = req.body;
-
-//         const appointment = await Appointment.findById(id);
-
-//         if (!appointment) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: "Appointment not found"
-//             });
-//         }
-
-//         // Only assigned doctor can write prescription
-//         if (appointment.doctor.toString() !== req.user._id.toString()) {
-//             return res.status(403).json({
-//                 success: false,
-//                 message: "Unauthorized"
-//             });
-//         }
-
-//         appointment.prescription = {
-//             medicines,
-//             notes
-//         };
-
-//         await appointment.save();
-
-//         return res.status(200).json({
-//             success: true,
-//             message: "Prescription added successfully",
-//             appointment
-//         });
-
-//     } catch (error) {
-
-//         return res.status(500).json({
-//             success: false,
-//             message: error.message
-//         });
-
+//     // 1. Validate payload
+//     if (!medicines || !Array.isArray(medicines) || medicines.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "At least one medicine is required.",
+//       });
 //     }
+
+//     // 2. Fetch appointment
+//     const appointment = await Appointment.findById(id);
+
+//     if (!appointment) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Appointment not found",
+//       });
+//     }
+
+//     // 3. Authorization check (Defensive string conversion)
+//     const doctorId = appointment.doctor?.toString();
+//     const currentUserId = req.user?._id?.toString();
+
+//     if (!doctorId || !currentUserId || doctorId !== currentUserId) {
+//       return res.status(403).json({
+//         success: false,
+//         message: "Unauthorized: Only the assigned doctor can write a prescription.",
+//       });
+//     }
+
+//     // 4. Update prescription & optionally update status
+//     appointment.prescription = {
+//       medicines,
+//       notes: notes || "",
+//     };
+
+//     // Auto-complete appointment upon prescribing medicine
+//     appointment.status = "Completed";
+
+//     await appointment.save();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Prescription added successfully",
+//       appointment,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message || "Internal server error",
+//     });
+//   }
 // };
 
 export const getDoctorDashboard = async (req, res) => {
@@ -154,3 +166,4 @@ export const getDoctorDashboard = async (req, res) => {
     });
   }
 };
+

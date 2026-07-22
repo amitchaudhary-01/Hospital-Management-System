@@ -2,6 +2,7 @@ import express from "express";
 import {
   // getDoctorAppointments,
   getDoctorDashboard,
+  // writePrescription,
   // updateAppointmentStatus,
   // writePrescription,
 } from "../controllers/doctor.controller.js";
@@ -22,5 +23,7 @@ const router = express.Router();
 
 // GET dashboard stats (Added "doctor" role argument)
 router.get("/dashboard", isAuthenticated, authorizeRoles("doctor"), getDoctorDashboard);
+
+// router.post("/:id/prescriptions", isAuthenticated , authorizeRoles("doctor"), writePrescription)
 
 export default router;

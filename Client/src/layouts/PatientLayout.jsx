@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { House, CalendarDays, User } from 'lucide-react'; // Added User icon
+import { House, CalendarDays, User, FileText } from 'lucide-react'; // Added User icon
 
 const PatientLayout = () => {
   const { logout, user } = useAuth();
@@ -29,6 +29,11 @@ const PatientLayout = () => {
     //   path: "/patient/profile",
     //   icon: <User className="w-4 h-4" />
     // },
+     {
+    name: "My Prescriptions",
+    path: "/patient/prescriptions",
+    icon: <FileText className="w-4 h-4" />,
+  },
   ];
 
   return (

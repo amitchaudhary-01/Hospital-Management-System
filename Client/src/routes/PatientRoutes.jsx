@@ -4,6 +4,7 @@ import PatientHome from "../pages/patient/PatientHome";
 import Appointment from "../pages/patient/Appointment";
 import PatientProfile from "../pages/patient/PatientProfile";
 import BookAppointment from "../pages/patient/BookAppointment";
+import PatientPrescription from "../pages/patient/PatientPrescription";
 
 const PatientRoutes = (
   <Route path="/patient" element={<PatientLayout />}>
@@ -12,6 +13,7 @@ const PatientRoutes = (
     <Route path="appointments" element={<Appointment />} />
     <Route path="book/:doctorId" element={<BookAppointment />} />
     <Route path="profile" element={<PatientProfile />} />
+    <Route path="prescriptions" element={<PatientPrescription/>}/>
   </Route>
 );
 
