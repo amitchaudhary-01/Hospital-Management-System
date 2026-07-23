@@ -368,3 +368,128 @@ export const cancelAppointmentByAdmin = async (req, res) => {
     });
   }
 };
+
+// ==========================================
+// UPDATE PATIENT BY ADMIN
+// ==========================================
+export const updatePatient = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const patient = await User.findOneAndUpdate(
+      { _id: id, role: "patient" },
+      req.body,
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Patient updated successfully.",
+      patient,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ==========================================
+// DELETE PATIENT BY ADMIN
+// ==========================================
+export const deletePatient = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const patient = await User.findOneAndDelete({ _id: id, role: "patient" });
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Patient deleted successfully.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ==========================================
+// UPDATE APPOINTMENT STATUS BY ADMIN
+// ==========================================
+export const updateAppointmentStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const appointment = await Appointment.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true }
+    )
+      .populate("patient", "name email contactNumber")
+      .populate("doctor", "name email specialization contactNumber");
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Appointment status updated to ${status}.`,
+      appointment,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ==========================================
+// DELETE APPOINTMENT BY ADMIN
+// ==========================================
+export const deleteAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const appointment = await Appointment.findByIdAndDelete(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Appointment deleted successfully.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

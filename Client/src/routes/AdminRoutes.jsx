@@ -1,11 +1,19 @@
 import { Route } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import AllDoctors from "../pages/admin/AllDoctors";
+import AllPatients from "../pages/admin/AllPatients";
+import AllAppointment from "../pages/admin/AllAppointment";
+import CreateDoctor from "../pages/admin/CreateDoctor";
 
 const AdminRoutes = (
   <Route path="/admin" element={<AdminLayout />}>
     <Route index element={<AdminDashboard />} />
     <Route path="dashboard" element={<AdminDashboard />} />
+    <Route path="doctors" element={<AllDoctors/>}/>
+    <Route path="patients" element={<AllPatients/>}/>
+    <Route path="appointments" element={<AllAppointment/>}/>
+    <Route path="doctor" element={<CreateDoctor/>}/>
 
     {/* Doctors */}
     <Route
