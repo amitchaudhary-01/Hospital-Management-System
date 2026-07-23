@@ -4,6 +4,7 @@ import SignUp from "../pages/auth/SignUp";
 
 import PatientRoutes from "./PatientRoutes";
 import DoctorRoutes from "./DoctorRoutes";
+import AdminRoutes from "./AdminRoutes";
 
 const AppRoutes = () => {
   return (
@@ -12,12 +13,16 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
 
-      {/* Nested Patient Routes */}
+      {/* Patient Routes */}
       {PatientRoutes}
 
+      {/* Doctor Routes */}
       {DoctorRoutes}
 
-      {/* Catch-all fallback if someone types a broken URL */}
+      {/* Admin Routes */}
+      {AdminRoutes}
+
+      {/* Catch-all fallback */}
       <Route path="*" element={<div>Page Not Found</div>} />
     </Routes>
   );

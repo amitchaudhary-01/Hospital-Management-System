@@ -31,7 +31,7 @@ const Login = () => {
       toast.success(res.message);
 
       setTimeout(() => {
-        if (res.user.role === "admin") navigate("/admin");
+        if (res.user.role === "admin") navigate("/admin/dashboard");
         else if (res.user.role === "doctor") navigate("/doctor/dashboard");
         else navigate("/patient/home");
       }, 1000);
@@ -73,10 +73,10 @@ const Login = () => {
           {/* Interactive Pull String Switch */}
           <button 
             onClick={() => setLampOn(!lampOn)}
-            className="absolute top-32 left-[calc(50%+40px)] flex flex-col items-center group focus:outline-none z-30 transition-transform active:translate-y-2 cursor-pointer"
+            className="absolute top-1 left-[calc(50%+40px)] flex flex-col items-center group focus:outline-none z-30 transition-transform active:translate-y-2 cursor-pointer"
             title="Pull to toggle light"
           >
-            <div className="w-[2px] h-24 bg-gray-400 group-hover:bg-cyan-400 transition-colors"></div>
+            <div className="w-[3px] h-58 bg-gray-400 group-hover:bg-cyan-400 transition-colors"></div>
             <div className="w-4 h-4 rounded-full bg-amber-500 group-hover:bg-cyan-400 border-2 border-slate-900 shadow-md"></div>
           </button>
 
