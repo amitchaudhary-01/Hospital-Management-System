@@ -11,7 +11,7 @@ export const downloadPrescription = async (prescriptionId) => {
     const token = localStorage.getItem("token");
 
     // CRITICAL: responseType must be 'blob' to receive PDF binary data
-    const response = await API.get(`/prescriptions/${prescriptionId}/download`, {
+    const response = await API.get(`/prescription/${prescriptionId}/download`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -12,13 +12,14 @@ export const signup = async (req, res) => {
             email,
             password,
             gender,
+            age,
             BloodGroup,
             contactNumber,
             address
         } = req.body;
 
         // Validation
-        if (!name || !email || !password || !contactNumber || !address || !gender || !BloodGroup) {
+        if (!name || !email || !password || !age ||!contactNumber || !address || !gender || !BloodGroup) {
             return res.status(400).json({
                 success: false,
                 message: "Please fill all required fields."
@@ -45,6 +46,7 @@ export const signup = async (req, res) => {
             password: hashedPassword,
             role: "patient",
             gender,
+            age,
             BloodGroup,
             contactNumber,
             address
@@ -59,6 +61,7 @@ export const signup = async (req, res) => {
                 email: newUser.email,
                 role: newUser.role,
                 gender:newUser.gender,
+                age:newUser.age,
                 BloodGroup:newUser.BloodGroup
             }
         });

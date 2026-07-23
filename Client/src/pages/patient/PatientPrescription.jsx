@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { FileText, Pill, Stethoscope, CalendarDays, AlertCircle } from "lucide-react";
+import { FileText, Pill, Stethoscope, CalendarDays, AlertCircle, Download, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../../api/axios";
+import { downloadPrescription } from "../../utils/prescriptionUtils"; 
 
 const PatientPrescription = () => {
   const [prescriptions, setPrescriptions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState(null);
 
   const fetchPrescriptions = async () => {
     try {
@@ -23,6 +25,18 @@ const PatientPrescription = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  // =========================================
+  // DOWNLOAD HANDLER
+  // =========================================
+  const handleDownload = async (prescriptionId) => {
+    try {
+      setDownloadingId(prescriptionId);
+      await downloadPrescription(prescriptionId);
+    } finally {
+      setDownloadingId(null);
     }
   };
 
@@ -55,7 +69,7 @@ const PatientPrescription = () => {
             </h1>
 
             <p className="text-sm text-slate-500 mt-1">
-              View prescriptions issued by your doctors.
+              View and download prescriptions issued by your doctors.
             </p>
           </div>
         </div>
@@ -99,15 +113,33 @@ const PatientPrescription = () => {
                     )}
                   </div>
 
-                  {prescription.createdAt && (
-                    <div className="flex items-center gap-2 text-xs text-slate-500">
-                      <CalendarDays className="w-4 h-4" />
+                  <div className="flex items-center gap-3">
+                    {prescription.createdAt && (
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <CalendarDays className="w-4 h-4" />
+                        {new Date(prescription.createdAt).toLocaleDateString()}
+                      </div>
+                    )}
 
-                      {new Date(
-                        prescription.createdAt
-                      ).toLocaleDateString()}
-                    </div>
-                  )}
+                    {/* Download Button */}
+                    <button
+                      onClick={() => handleDownload(prescription._id)}
+                      disabled={downloadingId === prescription._id}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 text-sky-700 hover:bg-sky-100 font-semibold rounded-lg text-xs border border-sky-200 transition-colors disabled:opacity-50"
+                    >
+                      {downloadingId === prescription._id ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Downloading...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-3.5 h-3.5" />
+                          Download PDF
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 
