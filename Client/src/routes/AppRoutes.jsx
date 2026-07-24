@@ -5,10 +5,12 @@ import SignUp from "../pages/auth/SignUp";
 import PatientRoutes from "./PatientRoutes";
 import DoctorRoutes from "./DoctorRoutes";
 import AdminRoutes from "./AdminRoutes";
+import LandingPage from "../layouts/LandingPage";
 
 const AppRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage/>}/>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
