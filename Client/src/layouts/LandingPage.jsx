@@ -14,6 +14,7 @@ import {
   Activity,
   Stethoscope
 } from 'lucide-react';
+import Footer from '../components/common/Footer';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const LandingPage = () => {
             +
           </div>
           <span className="text-xl font-bold tracking-tight text-slate-900">
-            UIXSHUVO
+            Hospital<p className='text-bold text-blue-500'>Care</p>
           </span>
         </div>
 
@@ -315,8 +316,10 @@ const LandingPage = () => {
         </div>
       </section>
 
+
+<Footer/>
       {/* ================= FOOTER ================= */}
-      <footer id="contact" className="border-t border-slate-200 bg-white mt-16">
+      {/* <footer id="contact" className="border-t border-slate-200 bg-white mt-16">
         <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-xs">
@@ -326,7 +329,7 @@ const LandingPage = () => {
           </div>
           <p>© {new Date().getFullYear()} All rights reserved. Built with MERN Stack & Tailwind CSS.</p>
         </div>
-      </footer>
+      </footer> */}
 
     </div>
   );
