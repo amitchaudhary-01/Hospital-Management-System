@@ -64,7 +64,7 @@ const LandingPage = () => {
             +
           </div>
           <span className="text-xl font-bold tracking-tight text-slate-900">
-            Hospital<p className='text-bold text-blue-500'>Care</p>
+            Hospital<p className='font-bold text-blue-500'>Care</p>
           </span>
         </div>
 
