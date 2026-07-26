@@ -97,7 +97,7 @@ const AdminDashboard = () => {
       <div>
         <h1 className="text-2xl font-bold text-slate-800">System Overview</h1>
         <p className="text-sm text-slate-500">
-          Welcome back, Administrator. Here is what is happening today.
+          Welcome back, Amit Chaudhary. Here is what is happening today.
         </p>
       </div>
 
