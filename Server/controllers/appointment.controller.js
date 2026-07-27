@@ -65,7 +65,7 @@ export const bookAppointment = async (req, res) => {
   }
 };
 
-// Get My Appointments (Patient)
+// Get My Appointments (Patient - Paginated)
 export const getMyAppointments = async (req, res) => {
   try {
     if (!req.user?._id) {
@@ -75,15 +75,36 @@ export const getMyAppointments = async (req, res) => {
       });
     }
 
-    const appointments = await Appointment.find({ patient: req.user._id })
-      .populate("doctor", "name email contactNumber address specialization")
-      .sort({ createdAt: -1 })
-      .lean();
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 10);
+    const skip = (page - 1) * limit;
+
+    const filter = { patient: req.user._id };
+
+    // Fetch paginated data and total count in parallel
+    const [appointments, totalCount] = await Promise.all([
+      Appointment.find(filter)
+        .populate("doctor", "name email contactNumber address specialization")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Appointment.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
 
     return res.status(200).json({
       success: true,
-      count: appointments.length,
       appointments,
+      pagination: {
+        totalCount,
+        totalPages,
+        currentPage: page,
+        pageSize: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
     });
   } catch (error) {
     console.error("Error in getMyAppointments:", error);
@@ -94,26 +115,93 @@ export const getMyAppointments = async (req, res) => {
   }
 };
 
-// Get Doctor Appointments (Doctor)
+// Get Doctor Appointments (Doctor - Paginated)
 export const getDoctorAppointments = async (req, res) => {
   try {
-    // FIXED: Changed req.user.id to req.user._id
     const doctorId = req.user._id || req.user.id;
 
-    const appointments = await Appointment.find({ doctor: doctorId })
-      .populate("patient", "name email contactNumber address")
-      .sort({ date: 1 });
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 10);
+    const skip = (page - 1) * limit;
+
+    const filter = { doctor: doctorId };
+
+    const [appointments, totalCount] = await Promise.all([
+      Appointment.find(filter)
+        .populate("patient", "name email contactNumber address")
+        .sort({ date: 1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Appointment.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
 
     return res.status(200).json({
       success: true,
-      count: appointments.length,
       appointments,
+      pagination: {
+        totalCount,
+        totalPages,
+        currentPage: page,
+        pageSize: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
     });
   } catch (error) {
     console.error("Error in getDoctorAppointments:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Failed to retrieve doctor appointments.",
+    });
+  }
+};
+
+// Get All Appointments (Admin - Paginated)
+export const getAllAppointments = async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 10);
+    const skip = (page - 1) * limit;
+
+    // Optional status or date filter support from query params
+    const filter = {};
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+
+    const [appointments, totalCount] = await Promise.all([
+      Appointment.find(filter)
+        .populate("patient", "name email contactNumber")
+        .populate("doctor", "name email specialization")
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Appointment.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return res.status(200).json({
+      success: true,
+      appointments,
+      pagination: {
+        totalCount,
+        totalPages,
+        currentPage: page,
+        pageSize: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    });
+  } catch (error) {
+    console.error("Error in getAllAppointments:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to retrieve all appointments.",
     });
   }
 };
@@ -196,6 +284,78 @@ export const updateAppointmentStatus = async (req, res) => {
   }
 };
 
-export const addPrescription = async (req, res) => {};
-export const getAllAppointments = async (req, res) => {};
-export const deleteAppointment = async (req, res) => {};
+// Add Prescription (Doctor)
+export const addPrescription = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { prescription } = req.body;
+
+    if (!prescription) {
+      return res.status(400).json({
+        success: false,
+        message: "Prescription content is required.",
+      });
+    }
+
+    const appointment = await Appointment.findById(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found.",
+      });
+    }
+
+    // Check if the current user is the doctor for this appointment
+    if (appointment.doctor.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden. You can only attach prescriptions to your own appointments.",
+      });
+    }
+
+    appointment.prescription = prescription;
+    await appointment.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Prescription attached successfully.",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Error adding prescription:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to add prescription.",
+    });
+  }
+};
+
+// Delete Appointment (Admin or Patient)
+export const deleteAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const appointment = await Appointment.findById(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found.",
+      });
+    }
+
+    await appointment.deleteOne();
+
+    return res.status(200).json({
+      success: true,
+      message: "Appointment deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting appointment:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to delete appointment.",
+    });
+  }
+};

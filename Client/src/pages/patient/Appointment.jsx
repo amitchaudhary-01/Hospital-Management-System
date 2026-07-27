@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import API from '../../api/axios';
-import { Calendar, Stethoscope, Mail, AlertCircle, RefreshCw } from 'lucide-react';
+import { Calendar, Stethoscope, Mail, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Appointment = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10); // Records per page
+  const [pagination, setPagination] = useState({
+    totalCount: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -15,14 +25,27 @@ const Appointment = () => {
         setLoading(true);
         setError('');
 
-        const response = await API.get('/appointments/my');
+        // Fetch paginated data from backend
+        const response = await API.get(`/appointments/my?page=${page}&limit=${limit}`);
 
         if (!isMounted) return;
 
         if (response.data?.appointments) {
           setAppointments(response.data.appointments);
+          
+          // Set pagination metadata from backend response
+          if (response.data.pagination) {
+            setPagination(response.data.pagination);
+          }
         } else if (Array.isArray(response.data)) {
+          // Fallback for non-paginated legacy response
           setAppointments(response.data);
+          setPagination({
+            totalCount: response.data.length,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPrevPage: false,
+          });
         } else {
           setError('Data format received from server is invalid.');
         }
@@ -41,7 +64,7 @@ const Appointment = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [page, limit]); // Re-fetch when page changes
 
   // Helper function returning Tailwind classes for badge status
   const getStatusBadgeClass = (status = '') => {
@@ -70,7 +93,7 @@ const Appointment = () => {
           </p>
         </div>
         <div className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 w-fit">
-          Total: {appointments.length}
+          Total Records: {pagination.totalCount || appointments.length}
         </div>
       </div>
 
@@ -172,6 +195,36 @@ const Appointment = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {pagination.totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 bg-slate-50/50 text-xs text-slate-600">
+              <div>
+                Showing page <span className="font-semibold text-slate-800">{page}</span> of{' '}
+                <span className="font-semibold text-slate-800">{pagination.totalPages}</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={!pagination.hasPrevPage || loading}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Previous</span>
+                </button>
+
+                <button
+                  onClick={() => setPage((prev) => Math.min(prev + 1, pagination.totalPages))}
+                  disabled={!pagination.hasNextPage || loading}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

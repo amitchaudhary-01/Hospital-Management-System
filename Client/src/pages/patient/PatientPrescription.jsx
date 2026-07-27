@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileText, Pill, Stethoscope, CalendarDays, AlertCircle, Download, Loader2 } from "lucide-react";
+import { FileText, Pill, Stethoscope, CalendarDays, AlertCircle, Download, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../../api/axios";
 import { downloadPrescription } from "../../utils/prescriptionUtils"; 
@@ -9,13 +9,27 @@ const PatientPrescription = () => {
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState(null);
 
-  const fetchPrescriptions = async () => {
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    totalCount: 0,
+    totalPages: 1,
+    pageSize: 5,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+
+  const fetchPrescriptions = async (page = 1) => {
     try {
       setLoading(true);
 
-      const response = await API.get("/patient/prescriptions");
+      const response = await API.get(`/patient/prescriptions?page=${page}&limit=5`);
 
       setPrescriptions(response.data.prescriptions || []);
+      
+      if (response.data.pagination) {
+        setPagination(response.data.pagination);
+      }
     } catch (error) {
       console.error("Fetch prescriptions error:", error);
 
@@ -25,6 +39,14 @@ const PatientPrescription = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle page changes
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setCurrentPage(newPage);
+      fetchPrescriptions(newPage);
     }
   };
 
@@ -41,10 +63,10 @@ const PatientPrescription = () => {
   };
 
   useEffect(() => {
-    fetchPrescriptions();
+    fetchPrescriptions(currentPage);
   }, []);
 
-  if (loading) {
+  if (loading && prescriptions.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <p className="text-slate-500 font-medium">
@@ -224,6 +246,36 @@ const PatientPrescription = () => {
               )}
             </div>
           ))}
+
+          {/* Pagination Controls */}
+          {pagination.totalPages > 1 && (
+            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-4 shadow-sm mt-4">
+              <p className="text-xs text-slate-500">
+                Page <span className="font-bold text-slate-700">{currentPage}</span> of{" "}
+                <span className="font-bold text-slate-700">{pagination.totalPages}</span>
+              </p>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!pagination.hasPrevPage || loading}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </button>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!pagination.hasNextPage || loading}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

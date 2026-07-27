@@ -1,90 +1,78 @@
-
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { FilePlus2, Pill, ChevronLeft, ChevronRight } from "lucide-react";
 
 import PrescriptionForm from "../../components/PrescriptionForm";
 import PrescriptionCard from "../../components/PrescriptionCard";
-
 import API from "../../api/axios";
-
-import {
-  FilePlus2,
-  Pill,
-} from "lucide-react";
 
 const Prescriptions = () => {
   // =========================================
   // GET APPOINTMENT ID FROM URL
-  // Example:
-  // /doctor/prescriptions?appointmentId=123
+  // Example: /doctor/prescriptions?appointmentId=123
   // =========================================
-  const [searchParams] =
-    useSearchParams();
-
-  const appointmentId =
-    searchParams.get("appointmentId");
+  const [searchParams] = useSearchParams();
+  const appointmentId = searchParams.get("appointmentId");
 
   // =========================================
   // STATES
   // =========================================
-  const [
-    prescriptions,
-    setPrescriptions,
-  ] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState(null);
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [
-    downloadingId,
-    setDownloadingId,
-  ] = useState(null);
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    totalCount: 0,
+    totalPages: 1,
+    pageSize: 6,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
 
   // =========================================
-  // FETCH DOCTOR PRESCRIPTIONS
+  // FETCH ALL DOCTOR PRESCRIPTIONS (PAGINATED)
   // =========================================
-const fetchPrescriptions = async () => {
-  try {
-    setLoading(true);
+  const fetchPrescriptions = async (page = 1) => {
+    try {
+      setLoading(true);
 
-    if (!appointmentId) {
-      setPrescriptions([]);
-      return;
+      // ALWAYS fetch all prescriptions for the doctor regardless of appointmentId filter
+const res = await API.get(`/prescription?page=${page}&limit=5`);
+      setPrescriptions(res.data.prescriptions || []);
+
+      if (res.data.pagination) {
+        setPagination(res.data.pagination);
+      }
+    } catch (err) {
+      console.error("Fetch prescriptions error:", err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const res = await API.get(
-      `/prescription/appointment/${appointmentId}`
-    );
+  // Handle Page Change
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setCurrentPage(newPage);
+      fetchPrescriptions(newPage);
+    }
+  };
 
-    setPrescriptions(
-      res.data.prescriptions || []
-    );
-  } catch (err) {
-    console.error(
-      "Fetch prescriptions error:",
-      err
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-useEffect(() => {
-  fetchPrescriptions();
-}, [appointmentId]);
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchPrescriptions(1);
+  }, [appointmentId]);
 
   return (
     <div className="min-h-screen bg-slate-50/70 p-4 sm:p-6 lg:p-8">
-
       <div className="max-w-7xl mx-auto space-y-6">
-
         {/* =================================
             PAGE HEADER
         ================================= */}
         <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
-
           <div className="flex items-center gap-2.5">
-
             <div className="p-2 rounded-xl bg-sky-100 text-sky-700">
               <Pill className="w-6 h-6" />
             </div>
@@ -92,36 +80,26 @@ useEffect(() => {
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Prescriptions Management
             </h1>
-
           </div>
 
           <p className="text-xs sm:text-sm font-medium text-slate-500 mt-2 ml-11">
-            Create, view, and issue medical
-            prescriptions to patients.
+            Create, view, and issue medical prescriptions to patients.
           </p>
-
         </div>
 
         {/* =================================
             LAYOUT
         ================================= */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
           {/* =================================
               LEFT: PRESCRIPTION FORM
           ================================= */}
           {appointmentId && (
             <div className="lg:col-span-5">
-
               <PrescriptionForm
-                appointmentId={
-                  appointmentId
-                }
-                onSuccess={
-                  fetchPrescriptions
-                }
+                appointmentId={appointmentId}
+                onSuccess={() => fetchPrescriptions(currentPage)}
               />
-
             </div>
           )}
 
@@ -130,99 +108,100 @@ useEffect(() => {
           ================================= */}
           <div
             className={
-              appointmentId
-                ? "lg:col-span-7"
-                : "lg:col-span-12"
+              appointmentId ? "lg:col-span-7" : "lg:col-span-12"
             }
           >
-
             <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-
                 <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-
                   <FilePlus2 className="w-4 h-4 text-sky-600" />
-
-                  Recent Prescriptions
-
+                  All Prescriptions
                 </h2>
 
                 <span className="text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-1 rounded-full">
-
-                  {prescriptions.length} Records
-
+                  {pagination.totalCount || prescriptions.length} Records
                 </span>
-
               </div>
 
-              {/* Loading */}
-              {loading ? (
-
+              {/* Loading State */}
+              {loading && prescriptions.length === 0 ? (
                 <div className="py-12 text-center text-sm font-semibold text-slate-500">
-
                   Loading prescriptions...
-
                 </div>
-
               ) : prescriptions.length === 0 ? (
-
-                /* Empty */
+                /* Empty State */
                 <div className="py-12 text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-
                   <p className="text-sm font-bold text-slate-600">
                     No prescriptions found
                   </p>
-
                   <p className="text-xs text-slate-400 mt-1">
-                    Select an appointment to
-                    generate a new prescription.
+                    Select an appointment to generate a new prescription.
                   </p>
-
                 </div>
-
               ) : (
-
-                /* Prescription Cards */
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                  {prescriptions.map(
-                    (prescription) => (
-
+                /* Prescription Grid & Pagination */
+                <>
+                  <div
+                    className={`grid gap-4 ${
+                      appointmentId
+                        ? "grid-cols-1"
+                        : "grid-cols-1 md:grid-cols-2"
+                    }`}
+                  >
+                    {prescriptions.map((prescription) => (
                       <PrescriptionCard
-                        key={
-                          prescription._id
-                        }
-                        prescription={
-                          prescription
-                        }
-                        downloadingId={
-                          downloadingId
-                        }
-                        setDownloadingId={
-                          setDownloadingId
-                        }
+                        key={prescription._id}
+                        prescription={prescription}
+                        downloadingId={downloadingId}
+                        setDownloadingId={setDownloadingId}
                       />
+                    ))}
+                  </div>
 
-                    )
+                  {/* Pagination Navigation */}
+                  {pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-4">
+                      <p className="text-xs text-slate-500 font-medium">
+                        Page{" "}
+                        <span className="font-bold text-slate-800">
+                          {currentPage}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-bold text-slate-800">
+                          {pagination.totalPages}
+                        </span>
+                      </p>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={!pagination.hasPrevPage || loading}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          Previous
+                        </button>
+
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={!pagination.hasNextPage || loading}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
+                        >
+                          Next
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   )}
-
-                </div>
-
+                </>
               )}
-
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 };
 
 export default Prescriptions;
-
