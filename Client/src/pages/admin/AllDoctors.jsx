@@ -13,8 +13,7 @@ import {
   Plus, 
   Pencil, 
   Trash2, 
-  X,
-  ShieldCheck
+  X
 } from 'lucide-react';
 
 const AllDoctors = () => {
@@ -35,6 +34,7 @@ const AllDoctors = () => {
     register,
     handleSubmit,
     reset,
+    clearErrors,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -108,12 +108,13 @@ const AllDoctors = () => {
     setIsDeleteModalOpen(true);
   };
 
-  // Close Modals
+  // Close Modals & Clear State
   const closeModal = () => {
     setIsAddModalOpen(false);
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedDoctor(null);
+    clearErrors();
     reset();
   };
 
@@ -126,8 +127,14 @@ const AllDoctors = () => {
         await API.post('/admin/doctor', formData);
         toast.success('Doctor added successfully!');
       } else if (isEditModalOpen && selectedDoctor) {
+        // Remove empty password field on edit so it doesn't overwrite existing hash
+        const payload = { ...formData };
+        if (!payload.password) {
+          delete payload.password;
+        }
+
         // PUT /admin/doctor/:id
-        await API.put(`/admin/doctor/${selectedDoctor._id}`, formData);
+        await API.put(`/admin/doctor/${selectedDoctor._id}`, payload);
         toast.success('Doctor details updated successfully!');
       }
       closeModal();
@@ -137,7 +144,7 @@ const AllDoctors = () => {
         err.response?.data?.message ||
           (isAddModalOpen ? 'Failed to add doctor' : 'Failed to update doctor')
       );
-    } fontally; {
+    } finally {
       setSubmitting(false);
     }
   };
@@ -329,7 +336,7 @@ const AllDoctors = () => {
               </h3>
               <button
                 onClick={closeModal}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -344,7 +351,7 @@ const AllDoctors = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="Dr. XXXXXXX"
+                    placeholder="Dr. John Doe"
                     {...register('name', { required: 'Full name is required' })}
                     className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 focus:outline-none focus:bg-white ${
                       errors.name ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-blue-500'
@@ -362,7 +369,7 @@ const AllDoctors = () => {
                   </label>
                   <input
                     type="email"
-                    placeholder="XXXXXX@clinic.com"
+                    placeholder="doctor@clinic.com"
                     {...register('email', { 
                       required: 'Email address is required',
                       pattern: {
@@ -409,7 +416,7 @@ const AllDoctors = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="XXXXXXX"
+                    placeholder="Cardiology"
                     {...register('specialization')}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white"
                   />
@@ -422,7 +429,7 @@ const AllDoctors = () => {
                   </label>
                   <input
                     type="number"
-                    placeholder="XX"
+                    placeholder="5"
                     {...register('experience')}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white"
                   />
@@ -435,7 +442,7 @@ const AllDoctors = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="+977 xxxxxxxxxx"
+                    placeholder="+977 9800000000"
                     {...register('phone')}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white"
                   />
@@ -447,14 +454,14 @@ const AllDoctors = () => {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer"
                 >
                   {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                   <span>{isAddModalOpen ? 'Create Doctor' : 'Save Changes'}</span>
@@ -481,14 +488,14 @@ const AllDoctors = () => {
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteDoctor}
                 disabled={submitting}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer"
               >
                 {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 <span>Delete</span>

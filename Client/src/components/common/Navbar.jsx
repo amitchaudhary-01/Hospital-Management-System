@@ -39,6 +39,9 @@ const Navbar = () => {
 
         {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <a href="#home" className="hover:text-blue-600 transition-colors">
+            Home
+          </a>
           <a href="#about" className="hover:text-blue-600 transition-colors">
             About
           </a>

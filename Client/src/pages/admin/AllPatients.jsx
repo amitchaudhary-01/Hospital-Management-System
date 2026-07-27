@@ -13,7 +13,9 @@ import {
   X,
   Pencil,
   Trash2,
-  UserCheck
+  UserCheck,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const AllPatients = () => {
@@ -21,6 +23,10 @@ const AllPatients = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
 
   // Modal States
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -34,6 +40,7 @@ const AllPatients = () => {
     register,
     handleSubmit,
     reset,
+    clearErrors,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -71,6 +78,12 @@ const AllPatients = () => {
     fetchPatients();
   }, []);
 
+  // Handle Search Input Change (Reset to Page 1)
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
   // Modal Controllers
   const openViewModal = (patient) => {
     setSelectedPatient(patient);
@@ -98,6 +111,7 @@ const AllPatients = () => {
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedPatient(null);
+    clearErrors();
     reset();
   };
 
@@ -142,6 +156,18 @@ const AllPatients = () => {
     return name.includes(term) || email.includes(term) || contact.includes(term) || age.includes(term);
   });
 
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredPatients.length / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPatients = filteredPatients.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header & Controls */}
@@ -164,7 +190,7 @@ const AllPatients = () => {
               type="text"
               placeholder="Search by name, email, phone..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white transition-all"
             />
           </div>
@@ -217,7 +243,7 @@ const AllPatients = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                {filteredPatients.map((patient) => (
+                {currentPatients.map((patient) => (
                   <tr key={patient._id} className="hover:bg-slate-50/60 transition-colors duration-150">
                     {/* Patient Name */}
                     <td className="py-4 px-6">
@@ -308,6 +334,53 @@ const AllPatients = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+              <p className="text-xs text-slate-500 font-medium">
+                Showing <span className="font-semibold text-slate-700">{startIndex + 1}</span> to{' '}
+                <span className="font-semibold text-slate-700">
+                  {Math.min(endIndex, filteredPatients.length)}
+                </span>{' '}
+                of <span className="font-semibold text-slate-700">{filteredPatients.length}</span> patients
+              </p>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  title="Previous Page"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
+                      currentPage === page
+                        ? 'bg-sky-600 text-white border-sky-600'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  title="Next Page"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -413,7 +486,13 @@ const AllPatients = () => {
                 <input
                   type="email"
                   placeholder="patient@example.com"
-                  {...register('email', { required: 'Email address is required' })}
+                  {...register('email', { 
+                    required: 'Email address is required',
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Invalid email address'
+                    }
+                  })}
                   className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 focus:outline-none focus:bg-white ${
                     errors.email ? 'border-rose-400' : 'border-slate-200 focus:border-sky-500'
                   }`}

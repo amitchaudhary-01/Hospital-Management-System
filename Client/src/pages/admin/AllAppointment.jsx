@@ -12,7 +12,9 @@ import {
   XCircle, 
   Trash2,
   Eye,
-  ShieldAlert
+  ShieldAlert,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const AllAppointment = () => {
@@ -22,22 +24,38 @@ const AllAppointment = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
+  // Pagination States
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [pagination, setPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
+
   // Modal States
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [appointmentToDelete, setAppointmentToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(null);
 
-  // Fetch Appointments List
-  const fetchAppointments = async () => {
+  // Fetch Appointments List with Pagination
+  const fetchAppointments = async (currentPage = page, currentLimit = limit) => {
     try {
       setLoading(true);
       setError('');
-      const response = await API.get('/admin/appointments');
+      const response = await API.get(`/admin/appointments?page=${currentPage}&limit=${currentLimit}`);
 
-      if (response.data?.appointments) {
-        setAppointments(response.data.appointments);
+      if (response.data?.success) {
+        setAppointments(response.data.appointments || []);
+        if (response.data.pagination) {
+          setPagination(response.data.pagination);
+        }
       } else if (Array.isArray(response.data)) {
+        // Fallback for non-paginated legacy response structure
         setAppointments(response.data);
       } else {
         setError('Invalid data format received from the server.');
@@ -52,8 +70,8 @@ const AllAppointment = () => {
   };
 
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    fetchAppointments(page, limit);
+  }, [page, limit]);
 
   // Update Appointment Status
   const handleStatusUpdate = async (id, status) => {
@@ -84,7 +102,9 @@ const AllAppointment = () => {
       setDeleting(true);
       await API.delete(`/admin/appointment/${appointmentToDelete._id}`);
       toast.success('Appointment record deleted successfully');
-      setAppointments((prev) => prev.filter((a) => a._id !== appointmentToDelete._id));
+      
+      // Refresh current page after deletion
+      fetchAppointments(page, limit);
       setAppointmentToDelete(null);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to delete appointment');
@@ -93,7 +113,7 @@ const AllAppointment = () => {
     }
   };
 
-  // Filter Logic matching backend Mongoose population
+  // Client-side Filter Logic for active page records
   const filteredAppointments = appointments.filter((apt) => {
     const patientName = apt.patient?.name || apt.userData?.name || apt.patientName || '';
     const doctorName = apt.doctor?.name || apt.docData?.name || apt.doctorName || '';
@@ -189,7 +209,7 @@ const AllAppointment = () => {
           </div>
 
           <span className="text-xs font-semibold px-3 py-2 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
-            Total: {filteredAppointments.length}
+            Total Records: {pagination.totalItems || filteredAppointments.length}
           </span>
         </div>
       </div>
@@ -347,6 +367,51 @@ const AllAppointment = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls Footer */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-slate-50/50 border-t border-slate-200">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <span>Show</span>
+              <select
+                value={limit}
+                onChange={(e) => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="px-2 py-1 bg-white border border-slate-200 rounded-lg font-medium text-slate-700 focus:outline-none focus:border-sky-500 cursor-pointer"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <span>entries per page</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-600 font-medium">
+                Page {pagination.currentPage} of {pagination.totalPages}
+              </span>
+              <div className="inline-flex items-center gap-1">
+                <button
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={!pagination.hasPrevPage}
+                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all"
+                  title="Previous Page"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setPage((prev) => prev + 1)}
+                  disabled={!pagination.hasNextPage}
+                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all"
+                  title="Next Page"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -396,8 +461,8 @@ const AllAppointment = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400">Date & Time:</span>
                   <span className="font-semibold text-slate-800">
-                    {selectedAppointment.appointmentDate || selectedAppointment.slotDate} at{' '}
-                    {selectedAppointment.appointmentTime || selectedAppointment.slotTime}
+                    {selectedAppointment.date || selectedAppointment.slotDate} at{' '}
+                    {selectedAppointment.timeSlot || selectedAppointment.slotTime}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
