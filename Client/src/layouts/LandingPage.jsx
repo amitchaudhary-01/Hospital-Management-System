@@ -15,6 +15,7 @@ import {
   Stethoscope
 } from 'lucide-react';
 import Footer from '../components/common/Footer';
+import Navbar from '../components/common/Navbar';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ const LandingPage = () => {
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       
       {/* ================= NAVBAR ================= */}
-      <nav className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+      {/* <nav className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-lg">
             +
@@ -89,7 +90,9 @@ const LandingPage = () => {
             Create an account
           </Link>
         </div>
-      </nav>
+      </nav> */}
+
+      <Navbar/>
 
       {/* ================= HERO SECTION ================= */}
       <section className="max-w-7xl mx-auto px-6 py-6">
@@ -279,7 +282,7 @@ const LandingPage = () => {
               <div 
                 key={doc._id} 
                 className="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs hover:shadow-md transition-all text-center group cursor-pointer"
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/auth/login')}
               >
                 <div className="w-full h-44 bg-slate-100 rounded-xl overflow-hidden mb-3 flex items-center justify-center">
                   {doc.image ? (
@@ -318,18 +321,6 @@ const LandingPage = () => {
 
 
 <Footer/>
-      {/* ================= FOOTER ================= */}
-      {/* <footer id="contact" className="border-t border-slate-200 bg-white mt-16">
-        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-xs">
-              +
-            </div>
-            <span className="font-bold text-slate-800">UIXSHUVO Hospital System</span>
-          </div>
-          <p>© {new Date().getFullYear()} All rights reserved. Built with MERN Stack & Tailwind CSS.</p>
-        </div>
-      </footer> */}
 
     </div>
   );

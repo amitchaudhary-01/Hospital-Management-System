@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -14,15 +14,15 @@ const Footer = () => {
       )
     },
     { 
-  aria: 'GitHub', 
-  url: 'https://github.com',
-  hoverColor: 'hover:bg-slate-800 hover:border-slate-700',
-  icon: (
-    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.008.069-.008 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-    </svg>
-  )
-},
+      aria: 'GitHub', 
+      url: 'https://github.com',
+      hoverColor: 'hover:bg-slate-800 hover:border-slate-700',
+      icon: (
+        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+          <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.008.069-.008 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+        </svg>
+      )
+    },
     { 
       aria: 'LinkedIn', 
       url: 'https://linkedin.com',
@@ -46,98 +46,121 @@ const Footer = () => {
   ];
 
   const quickLinks = [
-    {name:'Home', path:"/"},
-    {name:'About Us', path:'/aboutus'},
-    {name:'Doctors', path:'/book'}, 
-    {name:'Contact', path:'/sale'}];
+    { name: 'Home', path: '/' },
+    { name: 'About Us', path: '/aboutus' },
+    { name: 'Doctors', path: '/book' }, 
+    { name: 'Contact', path: '/sale' }
+  ];
+
   const supportLinks = [
-    {name:'Help Center', path:'/help'}, 
-    {name:'FAQs', path:'/FAQ'},
-    {name:'Terms of Service', path:'terms of service'},
-    {name:'Privacy Policy', path:'privacy policy'}];
+    { name: 'Help Center', path: '/help' }, 
+    { name: 'FAQs', path: '/FAQ' },
+    { name: 'Terms of Service', path: '/terms-of-service' },
+    { name: 'Privacy Policy', path: '/privacy-policy' }
+  ];
 
   return (
-    <footer className="bg-slate-950 text-gray-400 pt-16 pb-6 px-8 md:px-24 text-xs font-medium">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
-        
-        {/* Brand Section */}
-        <div className="col-span-2">
-          <h3 className="text-white text-red-500 text-base font-black tracking-wider mb-4">Hospital,<p className='text-blue-500'>Care</p></h3>
-          <p className="text-gray-400 leading-relaxed max-w-xs mb-4 text-[11px] opacity-80">
-            Your trusted digital Hospital Care built for Better Health Consultant and Online Appointment Booking for Checkup with Specialized Doctor.
-          </p>
+    <div className="relative w-full overflow-hidden pt-12">
+      {/* SVG WAVY TOP DIVIDER */}
+      <div className="absolute top-0 left-0 w-full overflow-hidden leading-none z-10 pointer-events-none">
+        <svg
+          className="relative block w-full h-[50px] md:h-[80px]"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0,0 C150,90 350,-40 500,45 C650,130 900,10 1200,50 L1200,120 L0,120 Z"
+            className="fill-slate-900"
+          ></path>
+        </svg>
+      </div>
+
+      <footer className="relative bg-slate-900 text-slate-300 pt-16 pb-8 px-8 md:px-24 text-xs font-medium z-0">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           
-          {/* Social Links Layout Area */}
-          <div className="flex gap-3">
-            {socialLinks.map((social, idx) => (
-              <a 
-                key={idx} 
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={social.aria}
-                className={`w-8 h-8 rounded-full bg-white/5 border border-white/10 text-white flex items-center justify-center transition-all duration-300 ${social.hoverColor}`}
-              >
-                {social.icon}
-              </a>
-            ))}
+          {/* Brand Section */}
+          <div className="col-span-2">
+            <h3 className="text-white text-base font-black tracking-wider mb-4 flex items-center gap-1">
+              Hospital,<span className="text-blue-500">Care</span>
+            </h3>
+            <p className="text-slate-400 leading-relaxed max-w-xs mb-6 text-[11px]">
+              Your trusted digital Hospital Care built for Better Health Consulting and Online Appointment Booking with Specialized Doctors.
+            </p>
+            
+            {/* Social Links Layout Area */}
+            <div className="flex gap-3">
+              {socialLinks.map((social, idx) => (
+                <a 
+                  key={idx} 
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.aria}
+                  className={`w-8 h-8 rounded-full bg-slate-800 border border-slate-700/60 text-slate-300 flex items-center justify-center transition-all duration-300 hover:text-white ${social.hoverColor}`}
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-white font-bold mb-4 uppercase text-[10px] tracking-wider">Quick Links</h4>
+            <ul className="space-y-2.5 text-slate-400">
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  <Link to={link.path} className="hover:text-blue-400 transition block py-0.5">
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Support Links */}
+          <div>
+            <h4 className="text-white font-bold mb-4 uppercase text-[10px] tracking-wider">Support</h4>
+            <ul className="space-y-2.5 text-slate-400">
+              {supportLinks.map((link) => (
+                <li key={link.name}>
+                  <Link to={link.path} className="hover:text-blue-400 transition block py-0.5">
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h4 className="text-white font-bold mb-4 uppercase text-[10px] tracking-wider">Contact Us</h4>
+            <ul className="space-y-2.5 text-slate-400">
+              <li className="flex items-center gap-2">
+                <span>📞</span> +977 9821005569
+              </li>
+              <li className="flex items-center gap-2">
+                <span>📧</span> HospitalCare@gmail.com
+              </li>
+              <li className="flex items-start gap-2 leading-relaxed">
+                <span>📍</span> Butwal, Rupendehi, Nepal
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between text-slate-500 text-[11px]">
+          <p>© 2026 HospitalCare. All rights reserved.</p>
+          <div className="flex gap-4 mt-2 sm:mt-0">
+            <span className="hover:text-slate-400 hover:underline cursor-pointer">Privacy Policy</span>
+            <span className="hover:text-slate-400 hover:underline cursor-pointer">Terms of Use</span>
           </div>
         </div>
+      </footer>
+    </div>
+  );
+};
 
-        {/* Quick Links */}
-        <div>
-          <h4 className="text-white font-bold mb-4 uppercase text-[10px] tracking-wider">Quick Links</h4>
-          <ul className="space-y-2.5 opacity-80">
-            {quickLinks.map((link) => (
-              <li key={link.name}>
-                <Link to={link.path} className="hover:text-white transition block py-0.5">
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {/* Support Links */}
-        <div>
-          <h4 className="text-white font-bold mb-4 uppercase text-[10px] tracking-wider">Support</h4>
-          <ul className="space-y-2.5 opacity-80">
-            {supportLinks.map((link) => (
-              <li key={link.name}>
-                <Link to={link.path} className="hover:text-white transition block py-0.5">
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Contact Info */}
-        <div>
-          <h4 className="text-white font-bold mb-4 uppercase text-[10px] tracking-wider">Contact Us</h4>
-          <ul className="space-y-2.5 opacity-80">
-            <li>
-              <span role="img" aria-label="phone">📞</span> +977 9821005569
-            </li>
-            <li>
-              <span role="img" aria-label="email">📧</span> HospitalCare@gmail.com
-            </li>
-            <li className="leading-relaxed">
-              <span role="img" aria-label="location">📍</span> Butwal, Rupendehi, Nepal
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Bottom Bar */}
-      <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row justify-between text-gray-500 text-[11px]">
-        <p>© 2026 eBooks. All rights reserved.</p>
-        <div className="flex gap-4 mt-2 sm:mt-0">
-          <span className="hover:underline cursor-pointer">Privacy Policy</span>
-          <span className="hover:underline cursor-pointer">Terms of Use</span>
-        </div>
-      </div>
-    </footer>
-  )
-}
-
-export default Footer
+export default Footer;
