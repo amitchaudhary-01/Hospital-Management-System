@@ -115,20 +115,26 @@ const AllPatients = () => {
     reset();
   };
 
-  // Submit Patient Edit Form
-  const onEditSubmit = async (formData) => {
-    try {
-      setSubmitting(true);
-      await API.put(`/admin/patient/${selectedPatient._id}`, formData);
-      toast.success('Patient details updated successfully!');
-      closeModal();
-      fetchPatients();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update patient');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+ // Submit Patient Edit Form
+const onEditSubmit = async (formData) => {
+  try {
+    setSubmitting(true);
+
+    const payload = {
+      ...formData,
+      age: formData.age ? Number(formData.age) : null,
+    };
+
+    await API.patch(`/admin/patient/${selectedPatient._id}`, payload);
+    toast.success('Patient details updated successfully!');
+    closeModal();
+    fetchPatients();
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Failed to update patient');
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   // Delete Patient Record
   const handleDeletePatient = async () => {

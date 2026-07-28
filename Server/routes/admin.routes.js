@@ -9,6 +9,10 @@ import {
   getAllAppointments,
   getPendingAppointments,
   cancelAppointmentByAdmin,
+  deletePatient,
+  deleteAppointment,
+  updatePatient,
+  updateAppointmentStatus,
   // adminDashboard,
 } from "../controllers/admin.controller.js";
 import { getDashboardStats } from "../controllers/admin.controller.js";
@@ -34,6 +38,11 @@ router.put("/doctor/:id", isAuthenticated, authorizeRoles("admin"), updateDoctor
 
 router.delete( "/doctor/:id", isAuthenticated, authorizeRoles("admin"), deleteDoctor);
 
+router.delete("/patient/:id", isAuthenticated, authorizeRoles("admin"),deletePatient)
+
+router.patch("/patient/:id",isAuthenticated,authorizeRoles("admin"),updatePatient)
+
+
 
 router.get("/patients", isAuthenticated, authorizeRoles("admin"), getAllPatients);
 
@@ -43,6 +52,11 @@ router.get("/appointments",isAuthenticated , authorizeRoles("admin"),getAllAppoi
 
 router.get("/appointments/pending", isAuthenticated , authorizeRoles("admin"),getPendingAppointments)
 
-router.put("/appointments/:id/cancel", isAuthenticated , authorizeRoles("admin"),cancelAppointmentByAdmin)
+router.put("/appointments/:id/cancel", isAuthenticated , authorizeRoles("admin"),
+cancelAppointmentByAdmin)
 
+router.delete("/appointment/:id",isAuthenticated, authorizeRoles("admin"),deleteAppointment)
+
+router.put("/appointment/:id",isAuthenticated,authorizeRoles("admin"),updateAppointmentStatus)
+ 
 export default router;

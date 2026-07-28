@@ -410,43 +410,46 @@ export const cancelAppointmentByAdmin = async (req, res) => {
 // UPDATE PATIENT BY ADMIN
 // ==========================================
 export const updatePatient = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name, contactNumber, address, password } = req.body;
+  try {
+    const { id } = req.params;
+    const { name, email, contactNumber, age, address, password } = req.body;
 
-        const updateData = {};
-        if (name) updateData.name = name;
-        if (contactNumber) updateData.contactNumber = contactNumber;
-        if (address) updateData.address = address;
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (contactNumber !== undefined) updateData.contactNumber = contactNumber;
+    if (age !== undefined) updateData.age = age;
+    if (address !== undefined) updateData.address = address;
 
-        if (password) {
-            updateData.password = await bcrypt.hash(password, 10);
-        }
-
-        const patient = await User.findOneAndUpdate(
-            { _id: id, role: "patient" },
-            { $set: updateData },
-            { new: true, runValidators: true }
-        ).select("-password");
-
-        if (!patient) {
-            return res.status(404).json({
-                success: false,
-                message: "Patient not found.",
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Patient updated successfully.",
-            patient,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+    if (password && password.trim() !== '') {
+      updateData.password = await bcrypt.hash(password, 10);
     }
+
+    // Use findOneAndUpdate instead of findByIdAndUpdate when passing filter objects
+    const patient = await User.findOneAndUpdate(
+      { _id: id, role: 'patient' },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient not found.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Patient updated successfully.',
+      patient,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
