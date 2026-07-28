@@ -43,7 +43,7 @@ const AllDoctors = () => {
       password: '',
       specialization: '',
       experience: '',
-      phone: '',
+      contactNumber: '',
     },
   });
 
@@ -83,7 +83,7 @@ const AllDoctors = () => {
       password: '',
       specialization: '',
       experience: '',
-      phone: '',
+      contactNumber: '',
     });
     setIsAddModalOpen(true);
   };
@@ -94,10 +94,10 @@ const AllDoctors = () => {
     reset({
       name: doctor.name || '',
       email: doctor.email || '',
-      password: '', // Kept empty unless changing
+      password: '',
       specialization: doctor.specialization || '',
       experience: doctor.experience || '',
-      phone: doctor.phone || '',
+      contactNumber: doctor.contactNumber || '',
     });
     setIsEditModalOpen(true);
   };
@@ -123,17 +123,13 @@ const AllDoctors = () => {
     try {
       setSubmitting(true);
       if (isAddModalOpen) {
-        // POST /admin/doctor
         await API.post('/admin/doctor', formData);
         toast.success('Doctor added successfully!');
       } else if (isEditModalOpen && selectedDoctor) {
-        // Remove empty password field on edit so it doesn't overwrite existing hash
         const payload = { ...formData };
         if (!payload.password) {
           delete payload.password;
         }
-
-        // PUT /admin/doctor/:id
         await API.put(`/admin/doctor/${selectedDoctor._id}`, payload);
         toast.success('Doctor details updated successfully!');
       }
@@ -149,7 +145,7 @@ const AllDoctors = () => {
     }
   };
 
-  // Handle Delete Doctor (DELETE /admin/doctor/:id)
+  // Handle Delete Doctor
   const handleDeleteDoctor = async () => {
     try {
       setSubmitting(true);
@@ -175,12 +171,12 @@ const AllDoctors = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 px-3 sm:px-6 py-4">
       {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2.5">
-            <Stethoscope className="w-6 h-6 text-blue-600" />
+          <h1 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2.5">
+            <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
             <span>All Doctors</span>
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -188,7 +184,7 @@ const AllDoctors = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           {/* Search Bar */}
           <div className="relative w-full sm:w-60">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -204,7 +200,7 @@ const AllDoctors = () => {
           {/* Add Doctor Button */}
           <button
             onClick={openAddModal}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors shrink-0 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors shrink-0 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Doctor</span>
@@ -214,7 +210,7 @@ const AllDoctors = () => {
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
           <RefreshCw className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
           <p className="text-slate-500 text-sm font-medium">Loading doctors list...</p>
         </div>
@@ -222,116 +218,203 @@ const AllDoctors = () => {
 
       {/* Error State */}
       {error && (
-        <div className="bg-rose-50 rounded-2xl border border-rose-200 p-6 flex items-center gap-3 text-rose-700">
+        <div className="bg-rose-50 rounded-2xl border border-rose-200 p-4 sm:p-6 flex items-center gap-3 text-rose-700">
           <AlertCircle className="w-5 h-5 shrink-0" />
-          <p className="text-sm font-medium">Error: {error}</p>
+          <p className="text-xs sm:text-sm font-medium">Error: {error}</p>
         </div>
       )}
 
       {/* Empty State */}
       {!loading && !error && filteredDoctors.length === 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
-          <Stethoscope className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-slate-700">No Doctors Found</h3>
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+          <Stethoscope className="w-10 h-10 sm:w-12 sm:h-12 text-slate-300 mx-auto mb-3" />
+          <h3 className="text-sm sm:text-base font-semibold text-slate-700">No Doctors Found</h3>
           <p className="text-xs text-slate-400 mt-1">
             {searchTerm ? "No doctors match your query." : "Click 'Add Doctor' to register a new doctor."}
           </p>
         </div>
       )}
 
-      {/* Table Section */}
+      {/* Data Section */}
       {!loading && !error && filteredDoctors.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-bold">
-                  <th className="py-3.5 px-6">Doctor Details</th>
-                  <th className="py-3.5 px-6">Specialization</th>
-                  <th className="py-3.5 px-6">Experience</th>
-                  <th className="py-3.5 px-6">Contact</th>
-                  <th className="py-3.5 px-6 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                {filteredDoctors.map((doc) => (
-                  <tr key={doc._id} className="hover:bg-slate-50/60 transition-colors duration-150">
-                    {/* Doctor Details */}
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
-                          {doc.name ? doc.name.charAt(0).toUpperCase() : 'D'}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-slate-800 leading-tight">
-                            {doc.name || 'Dr. Unknown'}
-                          </p>
-                          <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                            <Mail className="w-3 h-3" />
-                            <span>{doc.email || 'N/A'}</span>
-                          </p>
-                        </div>
+        <>
+          {/* MOBILE & TABLET VIEW: Card Grid (Visible below 'md' screen size) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
+            {filteredDoctors.map((doc) => (
+              <div 
+                key={doc._id} 
+                className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3.5 flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  {/* Doctor Header */}
+                  <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm shrink-0">
+                        {doc.name ? doc.name.charAt(0).toUpperCase() : 'D'}
                       </div>
-                    </td>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-800 text-sm truncate">
+                          {doc.name || 'Dr. Unknown'}
+                        </p>
+                        <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5 truncate">
+                          <Mail className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{doc.email || 'N/A'}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-                    {/* Specialization */}
-                    <td className="py-4 px-6">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100">
-                        <Award className="w-3.5 h-3.5 text-blue-500" />
-                        {doc.specialization || 'General Physician'}
+                  {/* Doctor Details Grid */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block mb-1">
+                        Specialization
                       </span>
-                    </td>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 font-semibold border border-blue-100 text-[11px]">
+                        <Award className="w-3 h-3 text-blue-500 shrink-0" />
+                        <span className="truncate">{doc.specialization || 'General'}</span>
+                      </span>
+                    </div>
 
-                    {/* Experience */}
-                    <td className="py-4 px-6 text-xs text-slate-600 font-medium">
-                      {doc.experience ? `${doc.experience} Years` : '—'}
-                    </td>
+                    <div>
+                      <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block mb-1">
+                        Experience
+                      </span>
+                      <span className="text-slate-700 font-medium">
+                        {doc.experience ? `${doc.experience} Years` : '—'}
+                      </span>
+                    </div>
 
-                    {/* Phone */}
-                    <td className="py-4 px-6 text-xs text-slate-600">
-                      {doc.phone ? (
+                    <div className="col-span-2 pt-1">
+                      <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block mb-1">
+                        Contact
+                      </span>
+                      {doc.contactNumber ? (
                         <div className="flex items-center gap-1.5 text-slate-700 font-medium">
-                          <Phone className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{doc.phone}</span>
+                          <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span>{doc.contactNumber}</span>
                         </div>
                       ) : (
                         <span className="text-slate-400">—</span>
                       )}
-                    </td>
+                    </div>
+                  </div>
+                </div>
 
-                    {/* Edit / Delete Buttons */}
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => openEditModal(doc)}
-                          className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                          title="Edit Doctor"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(doc)}
-                          className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                          title="Delete Doctor"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                {/* Card Action Buttons */}
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    onClick={() => openEditModal(doc)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-xl text-xs font-semibold transition-colors cursor-pointer border border-slate-200 hover:border-blue-200"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(doc)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 bg-slate-50 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold transition-colors cursor-pointer border border-slate-200 hover:border-rose-200"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* DESKTOP VIEW: Table (Visible on 'md' screens and up) */}
+          <div className="hidden md:block bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-bold">
+                    <th className="py-3.5 px-6">Doctor Details</th>
+                    <th className="py-3.5 px-6">Specialization</th>
+                    <th className="py-3.5 px-6">Experience</th>
+                    <th className="py-3.5 px-6">Contact</th>
+                    <th className="py-3.5 px-6 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+                  {filteredDoctors.map((doc) => (
+                    <tr key={doc._id} className="hover:bg-slate-50/60 transition-colors duration-150">
+                      {/* Doctor Details */}
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
+                            {doc.name ? doc.name.charAt(0).toUpperCase() : 'D'}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-slate-800 leading-tight">
+                              {doc.name || 'Dr. Unknown'}
+                            </p>
+                            <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                              <Mail className="w-3 h-3" />
+                              <span>{doc.email || 'N/A'}</span>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Specialization */}
+                      <td className="py-4 px-6">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100">
+                          <Award className="w-3.5 h-3.5 text-blue-500" />
+                          {doc.specialization || 'General Physician'}
+                        </span>
+                      </td>
+
+                      {/* Experience */}
+                      <td className="py-4 px-6 text-xs text-slate-600 font-medium">
+                        {doc.experience ? `${doc.experience} Years` : '—'}
+                      </td>
+
+                      {/* Phone */}
+                      <td className="py-4 px-6 text-xs text-slate-600">
+                        {doc.contactNumber ? (
+                          <div className="flex items-center gap-1.5 text-slate-700 font-medium">
+                            <Phone className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{doc.contactNumber}</span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400">—</span>
+                        )}
+                      </td>
+
+                      {/* Edit / Delete Buttons */}
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => openEditModal(doc)}
+                            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                            title="Edit Doctor"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(doc)}
+                            className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            title="Delete Doctor"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       {/* CREATE / EDIT MODAL */}
       {(isAddModalOpen || isEditModalOpen) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-6 space-y-5 animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-lg font-bold text-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-4 sm:p-6 space-y-4 sm:space-y-5 my-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 sm:pb-4">
+              <h3 className="text-base sm:text-lg font-bold text-slate-800">
                 {isAddModalOpen ? 'Register New Doctor' : 'Edit Doctor Details'}
               </h3>
               <button
@@ -343,7 +426,7 @@ const AllDoctors = () => {
             </div>
 
             <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {/* Full Name */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">
@@ -443,14 +526,14 @@ const AllDoctors = () => {
                   <input
                     type="text"
                     placeholder="+977 9800000000"
-                    {...register('phone')}
+                    {...register('contactNumber')}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white"
                   />
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-3 pt-3 sm:pt-4 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={closeModal}
@@ -475,7 +558,7 @@ const AllDoctors = () => {
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteModalOpen && selectedDoctor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-6 space-y-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4">
             <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
               <Trash2 className="w-5 h-5" />
             </div>

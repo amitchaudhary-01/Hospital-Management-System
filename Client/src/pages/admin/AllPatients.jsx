@@ -15,7 +15,8 @@ import {
   Trash2,
   UserCheck,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Eye
 } from 'lucide-react';
 
 const AllPatients = () => {
@@ -78,6 +79,31 @@ const AllPatients = () => {
     fetchPatients();
   }, []);
 
+  // Filter patients based on search
+  const filteredPatients = patients.filter((patient) => {
+    const name = patient.name?.toLowerCase() || '';
+    const email = patient.email?.toLowerCase() || '';
+    const age = String(patient.age || '').toLowerCase();
+    const contact = (patient.contactNumber || patient.phone || '').toLowerCase();
+    const term = searchTerm.toLowerCase();
+
+    return name.includes(term) || email.includes(term) || contact.includes(term) || age.includes(term);
+  });
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredPatients.length / itemsPerPage) || 1;
+
+  // Auto-adjust current page if items shrink (e.g., after deletion)
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [filteredPatients.length, totalPages, currentPage]);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPatients = filteredPatients.slice(startIndex, endIndex);
+
   // Handle Search Input Change (Reset to Page 1)
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -115,26 +141,26 @@ const AllPatients = () => {
     reset();
   };
 
- // Submit Patient Edit Form
-const onEditSubmit = async (formData) => {
-  try {
-    setSubmitting(true);
+  // Submit Patient Edit Form
+  const onEditSubmit = async (formData) => {
+    try {
+      setSubmitting(true);
 
-    const payload = {
-      ...formData,
-      age: formData.age ? Number(formData.age) : null,
-    };
+      const payload = {
+        ...formData,
+        age: formData.age ? Number(formData.age) : null,
+      };
 
-    await API.patch(`/admin/patient/${selectedPatient._id}`, payload);
-    toast.success('Patient details updated successfully!');
-    closeModal();
-    fetchPatients();
-  } catch (err) {
-    toast.error(err.response?.data?.message || 'Failed to update patient');
-  } finally {
-    setSubmitting(false);
-  }
-};
+      await API.patch(`/admin/patient/${selectedPatient._id}`, payload);
+      toast.success('Patient details updated successfully!');
+      closeModal();
+      fetchPatients();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update patient');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Delete Patient Record
   const handleDeletePatient = async () => {
@@ -151,23 +177,6 @@ const onEditSubmit = async (formData) => {
     }
   };
 
-  // Filter patients based on search
-  const filteredPatients = patients.filter((patient) => {
-    const name = patient.name?.toLowerCase() || '';
-    const email = patient.email?.toLowerCase() || '';
-    const age = String(patient.age || '').toLowerCase();
-    const contact = (patient.contactNumber || patient.phone || '').toLowerCase();
-    const term = searchTerm.toLowerCase();
-
-    return name.includes(term) || email.includes(term) || contact.includes(term) || age.includes(term);
-  });
-
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredPatients.length / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentPatients = filteredPatients.slice(startIndex, endIndex);
-
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -175,12 +184,12 @@ const onEditSubmit = async (formData) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
       {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2.5">
-            <Users className="w-6 h-6 text-sky-600" />
+          <h1 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2.5">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-sky-600 shrink-0" />
             <span>All Patients</span>
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -188,7 +197,7 @@ const onEditSubmit = async (formData) => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
           {/* Search Bar */}
           <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -201,7 +210,7 @@ const onEditSubmit = async (formData) => {
             />
           </div>
 
-          <span className="text-xs font-semibold px-3 py-2 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+          <span className="text-xs font-semibold px-3 py-2 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 text-center shrink-0">
             Total: {filteredPatients.length}
           </span>
         </div>
@@ -209,35 +218,114 @@ const onEditSubmit = async (formData) => {
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
-          <RefreshCw className="w-8 h-8 text-sky-600 animate-spin mx-auto mb-3" />
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+          <RefreshCw className="w-7 h-7 sm:w-8 sm:h-8 text-sky-600 animate-spin mx-auto mb-3" />
           <p className="text-slate-500 text-sm font-medium">Loading patients list...</p>
         </div>
       )}
 
       {/* Error State */}
       {error && (
-        <div className="bg-rose-50 rounded-2xl border border-rose-200 p-6 flex items-center gap-3 text-rose-700">
+        <div className="bg-rose-50 rounded-2xl border border-rose-200 p-4 sm:p-6 flex items-center gap-3 text-rose-700">
           <AlertCircle className="w-5 h-5 shrink-0" />
-          <p className="text-sm font-medium">Error: {error}</p>
+          <p className="text-xs sm:text-sm font-medium">Error: {error}</p>
         </div>
       )}
 
       {/* Empty State */}
       {!loading && !error && filteredPatients.length === 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
-          <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-slate-700">No Patients Found</h3>
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+          <Users className="w-10 h-10 sm:w-12 sm:h-12 text-slate-300 mx-auto mb-3" />
+          <h3 className="text-sm sm:text-base font-semibold text-slate-700">No Patients Found</h3>
           <p className="text-xs text-slate-400 mt-1">
             {searchTerm ? "No patient accounts match your query." : "There are no patients registered yet."}
           </p>
         </div>
       )}
 
-      {/* Table Section */}
+      {/* Content Container */}
       {!loading && !error && filteredPatients.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
+          
+          {/* MOBILE CARDS VIEW (Visible only on < md screens) */}
+          <div className="block md:hidden divide-y divide-slate-100">
+            {currentPatients.map((patient) => (
+              <div key={patient._id} className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 font-bold text-xs shrink-0">
+                      {patient.name ? patient.name.charAt(0).toUpperCase() : 'P'}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-800 leading-tight">
+                        {patient.name || 'Anonymous Patient'}
+                      </p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        ID: {patient._id?.slice(-6) || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Active
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5 text-xs">
+                  <div className="flex items-center gap-2 text-slate-700 font-medium truncate">
+                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">{patient.email || 'N/A'}</span>
+                  </div>
+                  {(patient.contactNumber || patient.phone) && (
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{patient.contactNumber || patient.phone}</span>
+                    </div>
+                  )}
+                  {patient.age && (
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{patient.age} yrs old</span>
+                    </div>
+                  )}
+                  {patient.createdAt && (
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>Registered: {new Date(patient.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Mobile Quick Action Buttons */}
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    onClick={() => openViewModal(patient)}
+                    className="flex-1 py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>View</span>
+                  </button>
+                  <button
+                    onClick={() => openEditModal(patient)}
+                    className="p-2 text-slate-600 hover:text-sky-600 bg-slate-100 hover:bg-sky-50 rounded-xl transition-colors cursor-pointer"
+                    title="Edit Patient"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(patient)}
+                    className="p-2 text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                    title="Delete Patient"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* DESKTOP TABLE VIEW (Visible on md+ screens) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-bold">
@@ -251,7 +339,6 @@ const onEditSubmit = async (formData) => {
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {currentPatients.map((patient) => (
                   <tr key={patient._id} className="hover:bg-slate-50/60 transition-colors duration-150">
-                    {/* Patient Name */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 font-bold text-xs shrink-0">
@@ -268,7 +355,6 @@ const onEditSubmit = async (formData) => {
                       </div>
                     </td>
 
-                    {/* Email, Phone & Age */}
                     <td className="py-4 px-6">
                       <div className="space-y-1 text-xs">
                         <div className="flex items-center gap-1.5 text-slate-700 font-medium">
@@ -290,7 +376,6 @@ const onEditSubmit = async (formData) => {
                       </div>
                     </td>
 
-                    {/* Registration Date */}
                     <td className="py-4 px-6 text-xs text-slate-600 font-medium">
                       {patient.createdAt ? (
                         <div className="flex items-center gap-1.5 text-slate-600">
@@ -302,7 +387,6 @@ const onEditSubmit = async (formData) => {
                       )}
                     </td>
 
-                    {/* Active Status */}
                     <td className="py-4 px-6">
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -310,7 +394,6 @@ const onEditSubmit = async (formData) => {
                       </span>
                     </td>
 
-                    {/* Action Buttons */}
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button
@@ -343,8 +426,8 @@ const onEditSubmit = async (formData) => {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-50/50">
-              <p className="text-xs text-slate-500 font-medium">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-100 bg-slate-50/50">
+              <p className="text-xs text-slate-500 font-medium text-center sm:text-left">
                 Showing <span className="font-semibold text-slate-700">{startIndex + 1}</span> to{' '}
                 <span className="font-semibold text-slate-700">
                   {Math.min(endIndex, filteredPatients.length)}
@@ -393,10 +476,10 @@ const onEditSubmit = async (formData) => {
       {/* PATIENT DETAILS MODAL */}
       {isViewModalOpen && selectedPatient && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 sm:pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center font-bold text-xs">
+                <div className="w-8 h-8 rounded-full bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center font-bold text-xs shrink-0">
                   {selectedPatient.name ? selectedPatient.name.charAt(0).toUpperCase() : 'P'}
                 </div>
                 <div>
@@ -413,26 +496,26 @@ const onEditSubmit = async (formData) => {
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2.5">
-                <div className="flex justify-between">
+              <div className="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-2">
                   <span className="text-slate-400">Email Address:</span>
-                  <span className="font-semibold text-slate-700">{selectedPatient.email || 'N/A'}</span>
+                  <span className="font-semibold text-slate-700 break-all">{selectedPatient.email || 'N/A'}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-2">
                   <span className="text-slate-400">Contact Number:</span>
                   <span className="font-semibold text-slate-700">
                     {selectedPatient.contactNumber || selectedPatient.phone || 'N/A'}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-2">
                   <span className="text-slate-400">Age:</span>
                   <span className="font-semibold text-slate-700">{selectedPatient.age ? `${selectedPatient.age} Years` : 'N/A'}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-2">
                   <span className="text-slate-400">User ID:</span>
-                  <span className="font-semibold text-slate-700">{selectedPatient._id}</span>
+                  <span className="font-semibold text-slate-700 break-all">{selectedPatient._id}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-2">
                   <span className="text-slate-400">Registered On:</span>
                   <span className="font-semibold text-slate-700">
                     {selectedPatient.createdAt ? new Date(selectedPatient.createdAt).toLocaleString() : 'N/A'}
@@ -444,7 +527,7 @@ const onEditSubmit = async (formData) => {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
               >
                 Close
               </button>
@@ -456,9 +539,9 @@ const onEditSubmit = async (formData) => {
       {/* EDIT PATIENT MODAL */}
       {isEditModalOpen && selectedPatient && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-lg font-bold text-slate-800">Edit Patient Details</h3>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 sm:pb-4">
+              <h3 className="text-base sm:text-lg font-bold text-slate-800">Edit Patient Details</h3>
               <button
                 onClick={closeModal}
                 className="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
@@ -508,7 +591,7 @@ const onEditSubmit = async (formData) => {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">
                     Contact Number
@@ -534,18 +617,18 @@ const onEditSubmit = async (formData) => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5 sm:gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                   <span>Save Changes</span>
@@ -559,7 +642,7 @@ const onEditSubmit = async (formData) => {
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteModalOpen && selectedPatient && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-6 space-y-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4">
             <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
               <Trash2 className="w-5 h-5" />
             </div>
@@ -569,17 +652,17 @@ const onEditSubmit = async (formData) => {
                 Are you sure you want to remove <span className="font-semibold text-slate-700">{selectedPatient.name}</span>? This action cannot be undone.
               </p>
             </div>
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5 sm:gap-3 pt-2">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeletePatient}
                 disabled={submitting}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 <span>Delete</span>
