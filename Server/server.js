@@ -20,7 +20,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173","https://hospital-management-system-r7w7.onrender.com"],
     credentials: true,
   })
 );
