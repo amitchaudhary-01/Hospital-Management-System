@@ -14,17 +14,21 @@ import prescriptionRoutes from './routes/prescription.routes.js'
 
 dotenv.config();
 
+
 const app = express();
 
 connectDB();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173","https://hospital-management-system-r7w7.onrender.com"],
+    origin: [
+      // "http://localhost:5173",
+      "https://hospital-management-system-r7w7.onrender.com"],
     credentials: true,
   })
 );
 
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cookieParser());
 

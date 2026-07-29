@@ -1,6 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {User} from '../schemas/user.Schema.js'
+import { User } from '../schemas/user.Schema.js';
+
+// Configuration for cross-origin cookies on HTTPS (Render)
+const cookieOptions = {
+    httpOnly: true,
+    secure: true,      // Required for cross-site cookies over HTTPS on Render
+    sameSite: "none",  // Required for cross-site requests (Frontend domain -> Backend domain)
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+};
 
 // =============================
 // Patient Signup
@@ -19,7 +27,7 @@ export const signup = async (req, res) => {
         } = req.body;
 
         // Validation
-        if (!name || !email || !password || !age ||!contactNumber || !address || !gender || !BloodGroup) {
+        if (!name || !email || !password || !age || !contactNumber || !address || !gender || !BloodGroup) {
             return res.status(400).json({
                 success: false,
                 message: "Please fill all required fields."
@@ -60,9 +68,9 @@ export const signup = async (req, res) => {
                 name: newUser.name,
                 email: newUser.email,
                 role: newUser.role,
-                gender:newUser.gender,
-                age:newUser.age,
-                BloodGroup:newUser.BloodGroup
+                gender: newUser.gender,
+                age: newUser.age,
+                BloodGroup: newUser.BloodGroup
             }
         });
 
@@ -79,7 +87,6 @@ export const signup = async (req, res) => {
 // =============================
 export const login = async (req, res) => {
     try {
-
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -116,13 +123,8 @@ export const login = async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        // Store token in cookie
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        // Store token in cookie with cross-origin options
+        res.cookie("token", token, cookieOptions);
 
         return res.status(200).json({
             success: true,
@@ -148,24 +150,25 @@ export const login = async (req, res) => {
 // Logout
 // =============================
 export const logout = async (req, res) => {
-
-    res.clearCookie("token");
+    // Clear cookie with matching sameSite & secure flags
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none"
+    });
 
     return res.status(200).json({
         success: true,
         message: "Logout successful."
     });
-
 };
 
 // =============================
 // Current User
 // =============================
 export const me = async (req, res) => {
-
     return res.status(200).json({
         success: true,
         user: req.user
     });
-
 };
