@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import Contact from "./ContactUs";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -78,19 +79,23 @@ const Navbar = () => {
             >
               About
             </a>
-            <Link to="/patient/doctors" className="hover:text-blue-600 transition-colors">
+            <Link to="/doctors" className="hover:text-blue-600 transition-colors">
               Doctor
             </Link>
-            <a
+            {/* <a
               href="/#process"
               onClick={(e) => handleAnchorClick(e, "process")}
               className="hover:text-blue-600 transition-colors"
             >
               How it works
-            </a>
+            </a> */}
+
+            <Link to="/process" className="hover:text-blue-600 transition-colors">How It work</Link>
+
             <Link to="/contact" className="hover:text-blue-600 transition-colors">
               Contact
             </Link>
+            
           </div>
 
           {/* Desktop Action Buttons */}

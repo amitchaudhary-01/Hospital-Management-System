@@ -14,8 +14,8 @@ import {
   Activity,
   Stethoscope
 } from 'lucide-react';
-import Footer from '../components/common/Footer';
-import Navbar from '../components/common/Navbar';
+// import Footer from '../components/common/Footer';
+// import Navbar from '../components/common/Navbar';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ const LandingPage = () => {
         </div>
       </nav> */}
 
-      <Navbar/>
+      {/* <Navbar/> */}
 
       {/* ================= HERO SECTION ================= */}
       <section className="max-w-7xl mx-auto px-6 py-6">
@@ -320,7 +320,7 @@ const LandingPage = () => {
       </section>
 
 
-<Footer/>
+{/* <Footer/> */}
 
     </div>
   );
