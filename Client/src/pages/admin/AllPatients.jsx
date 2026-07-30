@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import API from '../../api/axios';
 import toast from 'react-hot-toast';
-import Pagination from '../../components/Pagination';
 import { 
   Users, 
   Mail, 
@@ -15,6 +14,8 @@ import {
   Pencil,
   Trash2,
   UserCheck,
+  ChevronLeft,
+  ChevronRight,
   Eye
 } from 'lucide-react';
 
@@ -26,7 +27,7 @@ const AllPatients = () => {
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 6; // Increased slightly for better layout
 
   // Modal States
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -69,7 +70,7 @@ const AllPatients = () => {
       setError(
         err.response?.data?.message || 'Failed to fetch patients list.'
       );
-    } fontally; {
+    } finally {
       setLoading(false);
     }
   };
@@ -92,6 +93,7 @@ const AllPatients = () => {
   // Pagination Logic
   const totalPages = Math.ceil(filteredPatients.length / itemsPerPage) || 1;
 
+  // Auto-adjust current page if items shrink (e.g., after deletion)
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
@@ -102,11 +104,13 @@ const AllPatients = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentPatients = filteredPatients.slice(startIndex, endIndex);
 
+  // Handle Search Input Change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
 
+  // Modal Controllers
   const openViewModal = (patient) => {
     setSelectedPatient(patient);
     setIsViewModalOpen(true);
@@ -137,6 +141,7 @@ const AllPatients = () => {
     reset();
   }, [clearErrors, reset]);
 
+  // Close modals on 'Escape' keypress
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') closeModal();
@@ -145,6 +150,7 @@ const AllPatients = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [closeModal]);
 
+  // Submit Patient Edit Form with Local Optimistic State Update
   const onEditSubmit = async (formData) => {
     try {
       setSubmitting(true);
@@ -157,6 +163,7 @@ const AllPatients = () => {
       const response = await API.patch(`/admin/patient/${selectedPatient._id}`, payload);
       const updatedPatient = response.data?.patient || { ...selectedPatient, ...payload };
 
+      // Local State Update
       setPatients((prev) =>
         prev.map((p) => (p._id === selectedPatient._id ? updatedPatient : p))
       );
@@ -170,11 +177,13 @@ const AllPatients = () => {
     }
   };
 
+  // Delete Patient Record with Local Optimistic State Update
   const handleDeletePatient = async () => {
     try {
       setSubmitting(true);
       await API.delete(`/admin/patient/${selectedPatient._id}`);
       
+      // Local State Update
       setPatients((prev) => prev.filter((p) => p._id !== selectedPatient._id));
 
       toast.success('Patient record removed successfully');
@@ -207,6 +216,7 @@ const AllPatients = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+          {/* Search Bar */}
           <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -304,6 +314,7 @@ const AllPatients = () => {
                   )}
                 </div>
 
+                {/* Mobile Quick Action Buttons */}
                 <div className="flex items-center justify-end gap-2 pt-1">
                   <button
                     onClick={() => openViewModal(patient)}
@@ -431,15 +442,52 @@ const AllPatients = () => {
             </table>
           </div>
 
-          {/* Reusable Pagination Component */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            totalItems={filteredPatients.length}
-            startIndex={startIndex}
-            endIndex={endIndex}
-          />
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-100 bg-slate-50/50">
+              <p className="text-xs text-slate-500 font-medium text-center sm:text-left">
+                Showing <span className="font-semibold text-slate-700">{startIndex + 1}</span> to{' '}
+                <span className="font-semibold text-slate-700">
+                  {Math.min(endIndex, filteredPatients.length)}
+                </span>{' '}
+                of <span className="font-semibold text-slate-700">{filteredPatients.length}</span> patients
+              </p>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  title="Previous Page"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
+                      currentPage === page
+                        ? 'bg-sky-600 text-white border-sky-600'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  title="Next Page"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
