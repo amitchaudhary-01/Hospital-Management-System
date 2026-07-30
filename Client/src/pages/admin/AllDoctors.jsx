@@ -13,10 +13,9 @@ import {
   Plus, 
   Pencil, 
   Trash2, 
-  X,
-  ChevronLeft,
-  ChevronRight
+  X
 } from 'lucide-react';
+import Pagination from '../../components/Pagination';
 
 const AllDoctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -108,7 +107,7 @@ const AllDoctors = () => {
       email: doctor.email || '',
       password: '',
       specialization: doctor.specialization || '',
-      experience: doctor.experience || '',
+      experience: doctor.experience ?? '',
       contactNumber: doctor.contactNumber || '',
     });
     setIsEditModalOpen(true);
@@ -127,7 +126,14 @@ const AllDoctors = () => {
     setIsDeleteModalOpen(false);
     setSelectedDoctor(null);
     clearErrors();
-    reset();
+    reset({
+      name: '',
+      email: '',
+      password: '',
+      specialization: '',
+      experience: '',
+      contactNumber: '',
+    });
   };
 
   // Close modal on Escape key
@@ -145,11 +151,16 @@ const AllDoctors = () => {
   const onSubmitForm = async (formData) => {
     try {
       setSubmitting(true);
+      
+      const payload = {
+        ...formData,
+        experience: formData.experience !== '' ? Number(formData.experience) : null,
+      };
+
       if (isAddModalOpen) {
-        await API.post('/admin/doctor', formData);
+        await API.post('/admin/doctor', payload);
         toast.success('Doctor added successfully!');
       } else if (isEditModalOpen && selectedDoctor) {
-        const payload = { ...formData };
         if (!payload.password) {
           delete payload.password;
         }
@@ -195,9 +206,16 @@ const AllDoctors = () => {
   });
 
   // Calculate Pagination Slices
-  const totalPages = Math.ceil(filteredDoctors.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredDoctors.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedDoctors = filteredDoctors.slice(startIndex, startIndex + itemsPerPage);
+
+  // Fallback adjustment if current page is out of bounds after deletion
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -234,6 +252,7 @@ const AllDoctors = () => {
 
           {/* Add Doctor Button */}
           <button
+            type="button"
             onClick={openAddModal}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors shrink-0 cursor-pointer"
           >
@@ -272,7 +291,7 @@ const AllDoctors = () => {
 
       {/* Data Section */}
       {!loading && !error && filteredDoctors.length > 0 && (
-        <>
+        <div className="space-y-4">
           {/* MOBILE VIEW: Card Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
             {paginatedDoctors.map((doc) => (
@@ -336,6 +355,7 @@ const AllDoctors = () => {
 
                 <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                   <button
+                    type="button"
                     onClick={() => openEditModal(doc)}
                     className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-xl text-xs font-semibold transition-colors cursor-pointer border border-slate-200 hover:border-blue-200"
                   >
@@ -343,6 +363,7 @@ const AllDoctors = () => {
                     <span>Edit</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => openDeleteModal(doc)}
                     className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 bg-slate-50 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold transition-colors cursor-pointer border border-slate-200 hover:border-rose-200"
                   >
@@ -412,6 +433,7 @@ const AllDoctors = () => {
                       <td className="py-4 px-6 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
+                            type="button"
                             onClick={() => openEditModal(doc)}
                             className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                             title="Edit Doctor"
@@ -419,6 +441,7 @@ const AllDoctors = () => {
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
+                            type="button"
                             onClick={() => openDeleteModal(doc)}
                             className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                             title="Delete Doctor"
@@ -432,58 +455,30 @@ const AllDoctors = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination for Desktop (Inside Card Container) */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              hasPrevPage={currentPage > 1}
+              hasNextPage={currentPage < totalPages}
+              loading={loading}
+            />
           </div>
 
-          {/* PAGINATION CONTROLS */}
-          {totalPages > 1 && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-              <p className="text-xs text-slate-500 font-medium">
-                Showing <span className="font-semibold text-slate-800">{startIndex + 1}</span> to{' '}
-                <span className="font-semibold text-slate-800">
-                  {Math.min(startIndex + itemsPerPage, filteredDoctors.length)}
-                </span>{' '}
-                of <span className="font-semibold text-slate-800">{filteredDoctors.length}</span> doctors
-              </p>
-
-              <div className="flex items-center gap-1.5">
-                {/* Previous Button */}
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent text-slate-600 transition-colors cursor-pointer disabled:cursor-not-allowed"
-                  title="Previous Page"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-
-                {/* Page Number Buttons */}
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`min-w-[32px] h-8 px-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white shadow-xs'
-                        : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-
-                {/* Next Button */}
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent text-slate-600 transition-colors cursor-pointer disabled:cursor-not-allowed"
-                  title="Next Page"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-        </>
+          {/* Pagination for Mobile */}
+          <div className="block md:hidden">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              hasPrevPage={currentPage > 1}
+              hasNextPage={currentPage < totalPages}
+              loading={loading}
+            />
+          </div>
+        </div>
       )}
 
       {/* CREATE / EDIT MODAL */}
@@ -503,6 +498,7 @@ const AllDoctors = () => {
                 {isAddModalOpen ? 'Register New Doctor' : 'Edit Doctor Details'}
               </h3>
               <button
+                type="button"
                 onClick={closeModal}
                 className="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
               >
@@ -661,12 +657,14 @@ const AllDoctors = () => {
             </div>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
+                type="button"
                 onClick={closeModal}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleDeleteDoctor}
                 disabled={submitting}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
