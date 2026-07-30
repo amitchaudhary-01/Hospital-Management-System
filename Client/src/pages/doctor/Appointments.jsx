@@ -8,11 +8,10 @@ import {
   FileText, 
   CheckCircle2, 
   XCircle, 
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight
+  AlertCircle
 } from "lucide-react";
 import API from "../../api/axios";
+import Pagination from "../../components/Pagination";
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -61,10 +60,8 @@ const Appointments = () => {
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      setCurrentPage(newPage);
-      fetchAppointments(newPage);
-    }
+    setCurrentPage(newPage);
+    fetchAppointments(newPage);
   };
 
   useEffect(() => {
@@ -217,35 +214,17 @@ const Appointments = () => {
             })}
           </div>
 
-          {/* Pagination Navigation */}
-          {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
-              <p className="text-xs text-slate-500">
-                Page <span className="font-bold text-slate-800">{currentPage}</span> of{" "}
-                <span className="font-bold text-slate-800">{pagination.totalPages}</span>
-              </p>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={!pagination.hasPrevPage || loading}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={!pagination.hasNextPage || loading}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Reusable Pagination Component Container */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={pagination.totalPages}
+              hasPrevPage={pagination.hasPrevPage}
+              hasNextPage={pagination.hasNextPage}
+              loading={loading}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       )}
     </div>

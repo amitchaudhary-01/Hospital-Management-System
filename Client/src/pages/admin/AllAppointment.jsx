@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import API from '../../api/axios';
 import toast from 'react-hot-toast';
+import Pagination from '../../components/Pagination';
 import { 
   Calendar, 
   Search, 
@@ -12,17 +13,17 @@ import {
   XCircle, 
   Trash2,
   Eye,
-  ShieldAlert,
-  ChevronLeft,
-  ChevronRight,
-  DollarSign
+  ShieldAlert
 } from 'lucide-react';
 
 const AllAppointment = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Search & Filter States
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
   // Pagination States
@@ -43,12 +44,29 @@ const AllAppointment = () => {
   const [deleting, setDeleting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(null);
 
-  // Fetch Appointments List with Pagination
-  const fetchAppointments = async (currentPage = page, currentLimit = limit) => {
+  // Debounce Search Input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // Fetch Appointments from Server
+  const fetchAppointments = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      const response = await API.get(`/admin/appointments?page=${currentPage}&limit=${currentLimit}`);
+
+      const params = new URLSearchParams({
+        page,
+        limit,
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(statusFilter !== 'ALL' && { status: statusFilter })
+      });
+
+      const response = await API.get(`/admin/appointments?${params.toString()}`);
 
       if (response.data?.success) {
         setAppointments(response.data.appointments || []);
@@ -67,11 +85,23 @@ const AllAppointment = () => {
     } finally {
       setLoading(false);
     }
+  }, [page, limit, debouncedSearch, statusFilter]);
+
+  // Fetch data on query params update
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
+
+  // Reset page on search or status change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setPage(1);
   };
 
-  useEffect(() => {
-    fetchAppointments(page, limit);
-  }, [page, limit]);
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+    setPage(1);
+  };
 
   // Update Appointment Status
   const handleStatusUpdate = async (id, status) => {
@@ -102,7 +132,7 @@ const AllAppointment = () => {
       await API.delete(`/admin/appointment/${appointmentToDelete._id}`);
       toast.success('Appointment record deleted successfully');
       
-      fetchAppointments(page, limit);
+      fetchAppointments();
       setAppointmentToDelete(null);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to delete appointment');
@@ -111,57 +141,40 @@ const AllAppointment = () => {
     }
   };
 
-  // Client-side Filter Logic for active page records
-  const filteredAppointments = appointments.filter((apt) => {
-    const patientName = apt.patient?.name || apt.userData?.name || apt.patientName || '';
-    const doctorName = apt.doctor?.name || apt.docData?.name || apt.doctorName || '';
-    const term = searchTerm.toLowerCase();
-
-    const matchesSearch =
-      patientName.toLowerCase().includes(term) ||
-      doctorName.toLowerCase().includes(term);
-
-    const matchesStatus =
-      statusFilter === 'ALL' ||
-      apt.status?.toUpperCase() === statusFilter.toUpperCase();
-
-    return matchesSearch && matchesStatus;
-  });
-
-  // Dynamic Status Badge Helper
+  // Status Badge Component
   const getStatusBadge = (status) => {
     const normStatus = (status || 'PENDING').toUpperCase();
 
-    if (normStatus === 'CANCELLED') {
-      return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200/60 shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-          Cancelled
-        </span>
-      );
+    switch (normStatus) {
+      case 'CANCELLED':
+        return (
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200/60 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+            Cancelled
+          </span>
+        );
+      case 'COMPLETED':
+        return (
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            Completed
+          </span>
+        );
+      case 'CONFIRMED':
+        return (
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200/60 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+            Confirmed
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            Pending
+          </span>
+        );
     }
-    if (normStatus === 'COMPLETED') {
-      return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          Completed
-        </span>
-      );
-    }
-    if (normStatus === 'CONFIRMED') {
-      return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200/60 shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-          Confirmed
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 shrink-0">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-        Pending
-      </span>
-    );
   };
 
   return (
@@ -183,7 +196,7 @@ const AllAppointment = () => {
           <div className="relative w-full sm:w-auto">
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={handleStatusFilterChange}
               className="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:border-sky-500 focus:bg-white cursor-pointer"
             >
               <option value="ALL">All Status</option>
@@ -201,13 +214,13 @@ const AllAppointment = () => {
               type="text"
               placeholder="Search doctor or patient..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white transition-all"
             />
           </div>
 
           <span className="text-xs text-center font-semibold px-3 py-2 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
-            Total Records: {pagination.totalItems || filteredAppointments.length}
+            Total Records: {pagination.totalItems || appointments.length}
           </span>
         </div>
       </div>
@@ -229,7 +242,7 @@ const AllAppointment = () => {
       )}
 
       {/* Empty State */}
-      {!loading && !error && filteredAppointments.length === 0 && (
+      {!loading && !error && appointments.length === 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
           <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <h3 className="text-base font-semibold text-slate-700">No Appointments Found</h3>
@@ -242,12 +255,12 @@ const AllAppointment = () => {
       )}
 
       {/* Appointments List Section */}
-      {!loading && !error && filteredAppointments.length > 0 && (
+      {!loading && !error && appointments.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           
-          {/* MOBILE / TABLET CARD VIEW (visible below 'md' screen size) */}
+          {/* MOBILE / TABLET CARD VIEW */}
           <div className="block md:hidden divide-y divide-slate-100">
-            {filteredAppointments.map((apt) => {
+            {appointments.map((apt) => {
               const patient = apt.patient || apt.userData || {};
               const doctor = apt.doctor || apt.docData || {};
 
@@ -257,11 +270,11 @@ const AllAppointment = () => {
 
               const dateDisplay = apt.date || apt.slotDate || 'N/A';
               const timeDisplay = apt.timeSlot || apt.slotTime || 'N/A';
+              const normStatus = (apt.status || '').toUpperCase();
 
               return (
                 <div key={apt._id} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
                   <div className="flex items-start justify-between gap-2">
-                    {/* Patient info */}
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs shrink-0">
                         {patientName.charAt(0).toUpperCase()}
@@ -274,7 +287,6 @@ const AllAppointment = () => {
                     {getStatusBadge(apt.status)}
                   </div>
 
-                  {/* Doctor & Appointment info */}
                   <div className="grid grid-cols-2 gap-2 bg-slate-50/80 p-3 rounded-xl border border-slate-100 text-xs">
                     <div>
                       <p className="text-[10px] uppercase font-bold text-slate-400">Doctor</p>
@@ -294,19 +306,18 @@ const AllAppointment = () => {
                     </div>
                   </div>
 
-                  {/* Fees and Actions Bar */}
                   <div className="flex items-center justify-between pt-1">
                     <span className="text-xs font-bold text-slate-800">
                       Fees: ${apt.amount || doctor.fees || '0'}
                     </span>
 
                     <div className="flex items-center gap-1">
-                      {apt.status !== 'Completed' && apt.status !== 'Cancelled' && (
+                      {normStatus !== 'COMPLETED' && normStatus !== 'CANCELLED' && (
                         <>
                           <button
                             onClick={() => handleStatusUpdate(apt._id, 'Completed')}
                             disabled={updatingStatus === apt._id}
-                            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                             title="Mark Completed"
                           >
                             <CheckCircle className="w-4 h-4" />
@@ -314,7 +325,7 @@ const AllAppointment = () => {
                           <button
                             onClick={() => handleStatusUpdate(apt._id, 'Cancelled')}
                             disabled={updatingStatus === apt._id}
-                            className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                             title="Cancel Appointment"
                           >
                             <XCircle className="w-4 h-4" />
@@ -343,7 +354,7 @@ const AllAppointment = () => {
             })}
           </div>
 
-          {/* DESKTOP TABLE VIEW (visible on 'md' screens and above) */}
+          {/* DESKTOP TABLE VIEW */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -357,7 +368,7 @@ const AllAppointment = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                {filteredAppointments.map((apt) => {
+                {appointments.map((apt) => {
                   const patient = apt.patient || apt.userData || {};
                   const doctor = apt.doctor || apt.docData || {};
 
@@ -367,10 +378,10 @@ const AllAppointment = () => {
 
                   const dateDisplay = apt.date || apt.slotDate || 'N/A';
                   const timeDisplay = apt.timeSlot || apt.slotTime || 'N/A';
+                  const normStatus = (apt.status || '').toUpperCase();
 
                   return (
                     <tr key={apt._id} className="hover:bg-slate-50/60 transition-colors duration-150">
-                      {/* Patient Info */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs shrink-0">
@@ -383,7 +394,6 @@ const AllAppointment = () => {
                         </div>
                       </td>
 
-                      {/* Doctor Info */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 font-bold text-xs shrink-0">
@@ -396,7 +406,6 @@ const AllAppointment = () => {
                         </div>
                       </td>
 
-                      {/* Date & Time */}
                       <td className="py-4 px-6 text-xs text-slate-600 font-medium">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-1.5 text-slate-700 font-medium">
@@ -410,23 +419,20 @@ const AllAppointment = () => {
                         </div>
                       </td>
 
-                      {/* Fees */}
                       <td className="py-4 px-6 text-xs font-semibold text-slate-800">
                         ${apt.amount || doctor.fees || '0'}
                       </td>
 
-                      {/* Status Badge */}
                       <td className="py-4 px-6">{getStatusBadge(apt.status)}</td>
 
-                      {/* Actions */}
                       <td className="py-4 px-6 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          {apt.status !== 'Completed' && apt.status !== 'Cancelled' && (
+                          {normStatus !== 'COMPLETED' && normStatus !== 'CANCELLED' && (
                             <>
                               <button
                                 onClick={() => handleStatusUpdate(apt._id, 'Completed')}
                                 disabled={updatingStatus === apt._id}
-                                className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                                 title="Mark Completed"
                               >
                                 <CheckCircle className="w-4 h-4" />
@@ -434,7 +440,7 @@ const AllAppointment = () => {
                               <button
                                 onClick={() => handleStatusUpdate(apt._id, 'Cancelled')}
                                 disabled={updatingStatus === apt._id}
-                                className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                                 title="Cancel Appointment"
                               >
                                 <XCircle className="w-4 h-4" />
@@ -465,9 +471,9 @@ const AllAppointment = () => {
             </table>
           </div>
 
-          {/* Pagination Controls Footer */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 sm:px-6 py-4 bg-slate-50/50 border-t border-slate-200">
-            <div className="flex items-center gap-2 text-xs text-slate-500">
+          {/* Limit Selector & Pagination Controls */}
+          <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-200">
+            <div className="p-4 flex items-center gap-2 text-xs text-slate-500 shrink-0">
               <span>Show</span>
               <select
                 value={limit}
@@ -485,28 +491,15 @@ const AllAppointment = () => {
               <span>entries per page</span>
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-600 font-medium">
-                Page {pagination.currentPage} of {pagination.totalPages}
-              </span>
-              <div className="inline-flex items-center gap-1">
-                <button
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={!pagination.hasPrevPage}
-                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all"
-                  title="Previous Page"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setPage((prev) => prev + 1)}
-                  disabled={!pagination.hasNextPage}
-                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all"
-                  title="Next Page"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+            <div className="w-full sm:w-auto">
+              <Pagination
+                currentPage={pagination.currentPage || page}
+                totalPages={pagination.totalPages || 1}
+                onPageChange={(newPage) => setPage(newPage)}
+                hasPrevPage={pagination.hasPrevPage}
+                hasNextPage={pagination.hasNextPage}
+                loading={loading}
+              />
             </div>
           </div>
         </div>
@@ -515,7 +508,7 @@ const AllAppointment = () => {
       {/* APPOINTMENT DETAILS MODAL */}
       {selectedAppointment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 my-8 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 my-8">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-slate-800">Appointment Details</h3>
@@ -610,7 +603,7 @@ const AllAppointment = () => {
               <button
                 onClick={handleDeleteAppointment}
                 disabled={deleting}
-                className="w-full sm:w-auto px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                className="w-full sm:w-auto px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-50"
               >
                 {deleting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 <span>Delete</span>

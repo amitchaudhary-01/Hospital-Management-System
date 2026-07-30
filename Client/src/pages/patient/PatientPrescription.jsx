@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { FileText, Pill, Stethoscope, CalendarDays, AlertCircle, Download, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileText, Pill, Stethoscope, CalendarDays, AlertCircle, Download, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../../api/axios";
 import { downloadPrescription } from "../../utils/prescriptionUtils"; 
+import Pagination from "../../components/Pagination";
 
 const PatientPrescription = () => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -44,15 +45,11 @@ const PatientPrescription = () => {
 
   // Handle page changes
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      setCurrentPage(newPage);
-      fetchPrescriptions(newPage);
-    }
+    setCurrentPage(newPage);
+    fetchPrescriptions(newPage);
   };
 
-  // =========================================
-  // DOWNLOAD HANDLER
-  // =========================================
+  // Download Handler
   const handleDownload = async (prescriptionId) => {
     try {
       setDownloadingId(prescriptionId);
@@ -247,35 +244,17 @@ const PatientPrescription = () => {
             </div>
           ))}
 
-          {/* Pagination Controls */}
-          {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-4 shadow-sm mt-4">
-              <p className="text-xs text-slate-500">
-                Page <span className="font-bold text-slate-700">{currentPage}</span> of{" "}
-                <span className="font-bold text-slate-700">{pagination.totalPages}</span>
-              </p>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={!pagination.hasPrevPage || loading}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={!pagination.hasNextPage || loading}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Reusable Pagination Component Container */}
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={pagination.totalPages}
+              hasPrevPage={pagination.hasPrevPage}
+              hasNextPage={pagination.hasNextPage}
+              loading={loading}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       )}
     </div>

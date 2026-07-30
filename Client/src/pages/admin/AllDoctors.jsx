@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import API from '../../api/axios';
 import toast from 'react-hot-toast';
@@ -13,7 +13,9 @@ import {
   Plus, 
   Pencil, 
   Trash2, 
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const AllDoctors = () => {
@@ -21,6 +23,10 @@ const AllDoctors = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -48,7 +54,7 @@ const AllDoctors = () => {
   });
 
   // Fetch Doctors List
-  const fetchDoctors = async () => {
+  const fetchDoctors = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -68,11 +74,17 @@ const AllDoctors = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchDoctors();
-  }, []);
+  }, [fetchDoctors]);
+
+  // Reset to first page when search changes
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
   // Open Add Modal
   const openAddModal = () => {
@@ -118,6 +130,17 @@ const AllDoctors = () => {
     reset();
   };
 
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    if (isAddModalOpen || isEditModalOpen || isDeleteModalOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAddModalOpen, isEditModalOpen, isDeleteModalOpen]);
+
   // Handle Form Submission (Add or Edit)
   const onSubmitForm = async (formData) => {
     try {
@@ -147,6 +170,7 @@ const AllDoctors = () => {
 
   // Handle Delete Doctor
   const handleDeleteDoctor = async () => {
+    if (!selectedDoctor?._id) return;
     try {
       setSubmitting(true);
       await API.delete(`/admin/doctor/${selectedDoctor._id}`);
@@ -162,13 +186,24 @@ const AllDoctors = () => {
 
   // Filter doctors based on search
   const filteredDoctors = doctors.filter((doc) => {
+    const term = searchTerm.toLowerCase();
     const name = doc.name?.toLowerCase() || '';
     const spec = doc.specialization?.toLowerCase() || '';
     const email = doc.email?.toLowerCase() || '';
-    const term = searchTerm.toLowerCase();
 
     return name.includes(term) || spec.includes(term) || email.includes(term);
   });
+
+  // Calculate Pagination Slices
+  const totalPages = Math.ceil(filteredDoctors.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedDoctors = filteredDoctors.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 px-3 sm:px-6 py-4">
@@ -192,7 +227,7 @@ const AllDoctors = () => {
               type="text"
               placeholder="Search by name or spec..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
             />
           </div>
@@ -238,15 +273,14 @@ const AllDoctors = () => {
       {/* Data Section */}
       {!loading && !error && filteredDoctors.length > 0 && (
         <>
-          {/* MOBILE & TABLET VIEW: Card Grid (Visible below 'md' screen size) */}
+          {/* MOBILE VIEW: Card Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
-            {filteredDoctors.map((doc) => (
+            {paginatedDoctors.map((doc) => (
               <div 
                 key={doc._id} 
                 className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3.5 flex flex-col justify-between"
               >
                 <div className="space-y-3">
-                  {/* Doctor Header */}
                   <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm shrink-0">
@@ -264,7 +298,6 @@ const AllDoctors = () => {
                     </div>
                   </div>
 
-                  {/* Doctor Details Grid */}
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block mb-1">
@@ -301,7 +334,6 @@ const AllDoctors = () => {
                   </div>
                 </div>
 
-                {/* Card Action Buttons */}
                 <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                   <button
                     onClick={() => openEditModal(doc)}
@@ -322,7 +354,7 @@ const AllDoctors = () => {
             ))}
           </div>
 
-          {/* DESKTOP VIEW: Table (Visible on 'md' screens and up) */}
+          {/* DESKTOP VIEW: Table */}
           <div className="hidden md:block bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -336,9 +368,8 @@ const AllDoctors = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                  {filteredDoctors.map((doc) => (
+                  {paginatedDoctors.map((doc) => (
                     <tr key={doc._id} className="hover:bg-slate-50/60 transition-colors duration-150">
-                      {/* Doctor Details */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
@@ -356,7 +387,6 @@ const AllDoctors = () => {
                         </div>
                       </td>
 
-                      {/* Specialization */}
                       <td className="py-4 px-6">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100">
                           <Award className="w-3.5 h-3.5 text-blue-500" />
@@ -364,12 +394,10 @@ const AllDoctors = () => {
                         </span>
                       </td>
 
-                      {/* Experience */}
                       <td className="py-4 px-6 text-xs text-slate-600 font-medium">
                         {doc.experience ? `${doc.experience} Years` : '—'}
                       </td>
 
-                      {/* Phone */}
                       <td className="py-4 px-6 text-xs text-slate-600">
                         {doc.contactNumber ? (
                           <div className="flex items-center gap-1.5 text-slate-700 font-medium">
@@ -381,7 +409,6 @@ const AllDoctors = () => {
                         )}
                       </td>
 
-                      {/* Edit / Delete Buttons */}
                       <td className="py-4 px-6 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -406,13 +433,71 @@ const AllDoctors = () => {
               </table>
             </div>
           </div>
+
+          {/* PAGINATION CONTROLS */}
+          {totalPages > 1 && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+              <p className="text-xs text-slate-500 font-medium">
+                Showing <span className="font-semibold text-slate-800">{startIndex + 1}</span> to{' '}
+                <span className="font-semibold text-slate-800">
+                  {Math.min(startIndex + itemsPerPage, filteredDoctors.length)}
+                </span>{' '}
+                of <span className="font-semibold text-slate-800">{filteredDoctors.length}</span> doctors
+              </p>
+
+              <div className="flex items-center gap-1.5">
+                {/* Previous Button */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent text-slate-600 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                  title="Previous Page"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {/* Page Number Buttons */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`min-w-[32px] h-8 px-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                {/* Next Button */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent text-slate-600 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                  title="Next Page"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
 
       {/* CREATE / EDIT MODAL */}
       {(isAddModalOpen || isEditModalOpen) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-4 sm:p-6 space-y-4 sm:space-y-5 my-8">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto"
+          onClick={closeModal}
+        >
+          <div 
+            className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-4 sm:p-6 space-y-4 sm:space-y-5 my-8"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 sm:pb-4">
               <h3 className="text-base sm:text-lg font-bold text-slate-800">
                 {isAddModalOpen ? 'Register New Doctor' : 'Edit Doctor Details'}
@@ -469,28 +554,26 @@ const AllDoctors = () => {
                   )}
                 </div>
 
-                {/* Password (Add Mode Only) */}
-                {isAddModalOpen && (
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
-                      Password
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      {...register('password', { 
-                        required: 'Password is required',
-                        minLength: { value: 6, message: 'Password must be at least 6 characters' }
-                      })}
-                      className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 focus:outline-none focus:bg-white ${
-                        errors.password ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-blue-500'
-                      }`}
-                    />
-                    {errors.password && (
-                      <p className="text-[11px] text-rose-500 mt-1">{errors.password.message}</p>
-                    )}
-                  </div>
-                )}
+                {/* Password */}
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">
+                    {isAddModalOpen ? 'Password' : 'New Password (Optional)'}
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    {...register('password', { 
+                      required: isAddModalOpen ? 'Password is required' : false,
+                      minLength: { value: 6, message: 'Password must be at least 6 characters' }
+                    })}
+                    className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 focus:outline-none focus:bg-white ${
+                      errors.password ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-blue-500'
+                    }`}
+                  />
+                  {errors.password && (
+                    <p className="text-[11px] text-rose-500 mt-1">{errors.password.message}</p>
+                  )}
+                </div>
 
                 {/* Specialization */}
                 <div>
@@ -544,7 +627,7 @@ const AllDoctors = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                   <span>{isAddModalOpen ? 'Create Doctor' : 'Save Changes'}</span>
@@ -557,8 +640,16 @@ const AllDoctors = () => {
 
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteModalOpen && selectedDoctor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"
+          onClick={closeModal}
+        >
+          <div 
+            className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
             <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
               <Trash2 className="w-5 h-5" />
             </div>
@@ -578,7 +669,7 @@ const AllDoctors = () => {
               <button
                 onClick={handleDeleteDoctor}
                 disabled={submitting}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 <span>Delete</span>

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import API from '../../api/axios';
 import toast from 'react-hot-toast';
+import Pagination from '../../components/Pagination';
 import { 
   Users, 
   Mail, 
@@ -14,8 +15,6 @@ import {
   Pencil,
   Trash2,
   UserCheck,
-  ChevronLeft,
-  ChevronRight,
   Eye
 } from 'lucide-react';
 
@@ -27,7 +26,7 @@ const AllPatients = () => {
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 6;
 
   // Modal States
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -70,7 +69,7 @@ const AllPatients = () => {
       setError(
         err.response?.data?.message || 'Failed to fetch patients list.'
       );
-    } finally {
+    } fontally; {
       setLoading(false);
     }
   };
@@ -93,7 +92,6 @@ const AllPatients = () => {
   // Pagination Logic
   const totalPages = Math.ceil(filteredPatients.length / itemsPerPage) || 1;
 
-  // Auto-adjust current page if items shrink (e.g., after deletion)
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
@@ -104,13 +102,11 @@ const AllPatients = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentPatients = filteredPatients.slice(startIndex, endIndex);
 
-  // Handle Search Input Change (Reset to Page 1)
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
 
-  // Modal Controllers
   const openViewModal = (patient) => {
     setSelectedPatient(patient);
     setIsViewModalOpen(true);
@@ -132,16 +128,23 @@ const AllPatients = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsViewModalOpen(false);
     setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedPatient(null);
     clearErrors();
     reset();
-  };
+  }, [clearErrors, reset]);
 
-  // Submit Patient Edit Form
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [closeModal]);
+
   const onEditSubmit = async (formData) => {
     try {
       setSubmitting(true);
@@ -151,10 +154,15 @@ const AllPatients = () => {
         age: formData.age ? Number(formData.age) : null,
       };
 
-      await API.patch(`/admin/patient/${selectedPatient._id}`, payload);
+      const response = await API.patch(`/admin/patient/${selectedPatient._id}`, payload);
+      const updatedPatient = response.data?.patient || { ...selectedPatient, ...payload };
+
+      setPatients((prev) =>
+        prev.map((p) => (p._id === selectedPatient._id ? updatedPatient : p))
+      );
+
       toast.success('Patient details updated successfully!');
       closeModal();
-      fetchPatients();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update patient');
     } finally {
@@ -162,14 +170,15 @@ const AllPatients = () => {
     }
   };
 
-  // Delete Patient Record
   const handleDeletePatient = async () => {
     try {
       setSubmitting(true);
       await API.delete(`/admin/patient/${selectedPatient._id}`);
+      
+      setPatients((prev) => prev.filter((p) => p._id !== selectedPatient._id));
+
       toast.success('Patient record removed successfully');
       closeModal();
-      fetchPatients();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to delete patient');
     } finally {
@@ -198,7 +207,6 @@ const AllPatients = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
-          {/* Search Bar */}
           <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -247,7 +255,7 @@ const AllPatients = () => {
       {!loading && !error && filteredPatients.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           
-          {/* MOBILE CARDS VIEW (Visible only on < md screens) */}
+          {/* MOBILE CARDS VIEW */}
           <div className="block md:hidden divide-y divide-slate-100">
             {currentPatients.map((patient) => (
               <div key={patient._id} className="p-4 space-y-3">
@@ -267,7 +275,7 @@ const AllPatients = () => {
                   </div>
                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    Active
+                    {patient.status || 'Active'}
                   </span>
                 </div>
 
@@ -296,7 +304,6 @@ const AllPatients = () => {
                   )}
                 </div>
 
-                {/* Mobile Quick Action Buttons */}
                 <div className="flex items-center justify-end gap-2 pt-1">
                   <button
                     onClick={() => openViewModal(patient)}
@@ -324,7 +331,7 @@ const AllPatients = () => {
             ))}
           </div>
 
-          {/* DESKTOP TABLE VIEW (Visible on md+ screens) */}
+          {/* DESKTOP TABLE VIEW */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -390,7 +397,7 @@ const AllPatients = () => {
                     <td className="py-4 px-6">
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        Active User
+                        {patient.status || 'Active User'}
                       </span>
                     </td>
 
@@ -424,59 +431,28 @@ const AllPatients = () => {
             </table>
           </div>
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-100 bg-slate-50/50">
-              <p className="text-xs text-slate-500 font-medium text-center sm:text-left">
-                Showing <span className="font-semibold text-slate-700">{startIndex + 1}</span> to{' '}
-                <span className="font-semibold text-slate-700">
-                  {Math.min(endIndex, filteredPatients.length)}
-                </span>{' '}
-                of <span className="font-semibold text-slate-700">{filteredPatients.length}</span> patients
-              </p>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  title="Previous Page"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-
-                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
-                      currentPage === page
-                        ? 'bg-sky-600 text-white border-sky-600'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  title="Next Page"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Reusable Pagination Component */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={filteredPatients.length}
+            startIndex={startIndex}
+            endIndex={endIndex}
+          />
         </div>
       )}
 
       {/* PATIENT DETAILS MODAL */}
       {isViewModalOpen && selectedPatient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+        <div 
+          onClick={closeModal} 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 max-h-[90vh] overflow-y-auto"
+          >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 sm:pb-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center font-bold text-xs shrink-0">
@@ -538,8 +514,14 @@ const AllPatients = () => {
 
       {/* EDIT PATIENT MODAL */}
       {isEditModalOpen && selectedPatient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+        <div 
+          onClick={closeModal} 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 max-h-[90vh] overflow-y-auto"
+          >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 sm:pb-4">
               <h3 className="text-base sm:text-lg font-bold text-slate-800">Edit Patient Details</h3>
               <button
@@ -641,8 +623,14 @@ const AllPatients = () => {
 
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteModalOpen && selectedPatient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4">
+        <div 
+          onClick={closeModal} 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4"
+          >
             <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
               <Trash2 className="w-5 h-5" />
             </div>

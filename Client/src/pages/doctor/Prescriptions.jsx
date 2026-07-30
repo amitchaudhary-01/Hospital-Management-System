@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { FilePlus2, Pill, ChevronLeft, ChevronRight } from "lucide-react";
+import { FilePlus2, Pill } from "lucide-react";
 
 import PrescriptionForm from "../../components/PrescriptionForm";
 import PrescriptionCard from "../../components/PrescriptionCard";
+import Pagination from "../../components/Pagination";
 import API from "../../api/axios";
 
 const Prescriptions = () => {
@@ -39,7 +40,7 @@ const Prescriptions = () => {
       setLoading(true);
 
       // ALWAYS fetch all prescriptions for the doctor regardless of appointmentId filter
-const res = await API.get(`/prescription?page=${page}&limit=5`);
+      const res = await API.get(`/prescription?page=${page}&limit=5`);
       setPrescriptions(res.data.prescriptions || []);
 
       if (res.data.pagination) {
@@ -54,10 +55,8 @@ const res = await API.get(`/prescription?page=${page}&limit=5`);
 
   // Handle Page Change
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      setCurrentPage(newPage);
-      fetchPrescriptions(newPage);
-    }
+    setCurrentPage(newPage);
+    fetchPrescriptions(newPage);
   };
 
   useEffect(() => {
@@ -159,41 +158,17 @@ const res = await API.get(`/prescription?page=${page}&limit=5`);
                     ))}
                   </div>
 
-                  {/* Pagination Navigation */}
-                  {pagination.totalPages > 1 && (
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-4">
-                      <p className="text-xs text-slate-500 font-medium">
-                        Page{" "}
-                        <span className="font-bold text-slate-800">
-                          {currentPage}
-                        </span>{" "}
-                        of{" "}
-                        <span className="font-bold text-slate-800">
-                          {pagination.totalPages}
-                        </span>
-                      </p>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          disabled={!pagination.hasPrevPage || loading}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
-                        >
-                          <ChevronLeft className="w-4 h-4" />
-                          Previous
-                        </button>
-
-                        <button
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={!pagination.hasNextPage || loading}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition-colors"
-                        >
-                          Next
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  {/* Reusable Pagination Component */}
+                  <div className="pt-4 border-t border-slate-100 mt-4">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={pagination.totalPages}
+                      hasPrevPage={pagination.hasPrevPage}
+                      hasNextPage={pagination.hasNextPage}
+                      loading={loading}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
                 </>
               )}
             </div>

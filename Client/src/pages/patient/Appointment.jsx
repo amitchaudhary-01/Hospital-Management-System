@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import API from '../../api/axios';
-import { Calendar, Stethoscope, Mail, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Stethoscope, Mail, AlertCircle, RefreshCw } from 'lucide-react';
+import Pagination from '../../components/Pagination';
 
 const Appointment = () => {
   const [appointments, setAppointments] = useState([]);
@@ -9,7 +10,7 @@ const Appointment = () => {
 
   // Pagination states
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // Records per page
+  const [limit] = useState(5); // Records per page
   const [pagination, setPagination] = useState({
     totalCount: 0,
     totalPages: 1,
@@ -25,7 +26,6 @@ const Appointment = () => {
         setLoading(true);
         setError('');
 
-        // Fetch paginated data from backend
         const response = await API.get(`/appointments/my?page=${page}&limit=${limit}`);
 
         if (!isMounted) return;
@@ -33,12 +33,10 @@ const Appointment = () => {
         if (response.data?.appointments) {
           setAppointments(response.data.appointments);
           
-          // Set pagination metadata from backend response
           if (response.data.pagination) {
             setPagination(response.data.pagination);
           }
         } else if (Array.isArray(response.data)) {
-          // Fallback for non-paginated legacy response
           setAppointments(response.data);
           setPagination({
             totalCount: response.data.length,
@@ -64,9 +62,8 @@ const Appointment = () => {
     return () => {
       isMounted = false;
     };
-  }, [page, limit]); // Re-fetch when page changes
+  }, [page, limit]);
 
-  // Helper function returning Tailwind classes for badge status
   const getStatusBadgeClass = (status = '') => {
     const lower = status.toLowerCase();
     if (lower === 'approved' || lower === 'confirmed') {
@@ -75,7 +72,6 @@ const Appointment = () => {
     if (lower === 'cancelled' || lower === 'rejected') {
       return 'bg-rose-50 text-rose-700 border-rose-200/60';
     }
-    // Default Pending
     return 'bg-amber-50 text-amber-700 border-amber-200/60';
   };
 
@@ -197,12 +193,9 @@ const Appointment = () => {
                       key={item._id} 
                       className="hover:bg-slate-50/60 transition-colors duration-150"
                     >
-                      {/* Reason Column */}
                       <td className="py-4 px-6 font-semibold text-slate-800">
                         {item.reason || 'General Consultation'}
                       </td>
-
-                      {/* Doctor Details Column */}
                       <td className="py-4 px-6">
                         {item.doctor ? (
                           <div className="space-y-0.5">
@@ -221,8 +214,6 @@ const Appointment = () => {
                           </span>
                         )}
                       </td>
-
-                      {/* Specialization Column */}
                       <td className="py-4 px-6">
                         {item.doctor?.specialization ? (
                           <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
@@ -232,8 +223,6 @@ const Appointment = () => {
                           <span className="text-xs text-slate-400">—</span>
                         )}
                       </td>
-
-                      {/* Status Column */}
                       <td className="py-4 px-6">
                         <span
                           className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border capitalize ${badgeClass}`}
@@ -249,35 +238,15 @@ const Appointment = () => {
             </table>
           </div>
 
-          {/* Pagination Controls */}
-          {pagination.totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/50 text-xs text-slate-600">
-              <div>
-                Showing page <span className="font-semibold text-slate-800">{page}</span> of{' '}
-                <span className="font-semibold text-slate-800">{pagination.totalPages}</span>
-              </div>
-
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                <button
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={!pagination.hasPrevPage || loading}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 sm:active:scale-100"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span>Previous</span>
-                </button>
-
-                <button
-                  onClick={() => setPage((prev) => Math.min(prev + 1, pagination.totalPages))}
-                  disabled={!pagination.hasNextPage || loading}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 sm:active:scale-100"
-                >
-                  <span>Next</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Clean Substituted Reusable Pagination Component */}
+          <Pagination
+            currentPage={page}
+            totalPages={pagination.totalPages}
+            hasPrevPage={pagination.hasPrevPage}
+            hasNextPage={pagination.hasNextPage}
+            loading={loading}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
         </div>
       )}
     </div>
