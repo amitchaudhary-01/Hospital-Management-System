@@ -27,8 +27,8 @@ const AppRoutes = () => {
       <Route path="/doctors" element={<Doctor/>}/>
       <Route path="/process" element={<HowItWork/>}/>*/}
       {/* Public Routes */}
-      {/* <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />  */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} /> 
 
       {/* Patient Routes */}
       {PatientRoutes}
