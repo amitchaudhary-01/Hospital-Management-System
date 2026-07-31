@@ -72,13 +72,13 @@ const Navbar = () => {
             <Link to="/" className="hover:text-blue-600 transition-colors">
               Home
             </Link>
-            <a
-              href="/#about"
-              onClick={(e) => handleAnchorClick(e, "about")}
+            <Link
+              to="/about"
+              // onClick={(e) => handleAnchorClick(e, "about")}
               className="hover:text-blue-600 transition-colors"
             >
               About
-            </a>
+            </Link>
             <Link to="/doctors" className="hover:text-blue-600 transition-colors">
               Doctor
             </Link>

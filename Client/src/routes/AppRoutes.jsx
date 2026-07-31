@@ -10,6 +10,7 @@ import ContactUs from "../components/common/ContactUs";
 import Doctor from "../components/common/Doctor";
 import HowItWork from "../components/common/HowItWork";
 import Main from "../MainLayout/Main";
+import About from "../components/common/About";
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
       <Route path="/contact" element={<ContactUs/>}/>
       <Route path="/doctors" element={<Doctor/>}/>
       <Route path="/process" element={<HowItWork/>}/>
+      <Route path="/about" element={<About/>}/>
 
 
 
