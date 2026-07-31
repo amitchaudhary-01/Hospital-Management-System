@@ -121,13 +121,13 @@ const Navbar = () => {
               >
                 Home
               </Link>
-              <a
-                href="/#about"
+              <Link
+                to="/about"
                 onClick={(e) => handleAnchorClick(e, "about")}
                 className="px-3 py-2.5 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition-colors"
               >
                 About
-              </a>
+              </Link>
               <Link
                 to="/patient/doctors"
                 onClick={closeMenu}
@@ -135,13 +135,13 @@ const Navbar = () => {
               >
                 Doctor
               </Link>
-              <a
-                href="/#process"
+              <Link
+                to="/process"
                 onClick={(e) => handleAnchorClick(e, "process")}
                 className="px-3 py-2.5 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition-colors"
               >
                 How it works
-              </a>
+              </Link>
               <Link
                 to="/contact"
                 onClick={closeMenu}
