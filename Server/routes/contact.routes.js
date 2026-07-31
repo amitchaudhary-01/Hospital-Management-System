@@ -1,17 +1,32 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import dns from 'node:dns';
 import express from 'express';
 import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
+let smtpHost = 'smtp.gmail.com';
+try {
+  const addresses = await dns.promises.resolve4('smtp.gmail.com');
+  if (addresses.length) smtpHost = addresses[0];
+} catch {
+  // fall back to the hostname
+}
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: smtpHost,
+  port: 465,
+  secure: true,
+  servername: 'smtp.gmail.com',
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
+  connectionTimeout: 20000,
+  greetingTimeout: 20000,
+  socketTimeout: 60000,
 });
 
 router.post('/send-inquiry', async (req, res) => {
