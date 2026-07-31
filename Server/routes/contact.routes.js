@@ -1,12 +1,20 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
-router.post('/send-inquiry', async (req, res) => {
-  // Initialize Resend inside the request handler
-  const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
+router.post('/send-inquiry', async (req, res) => {
   const { from_name, from_email, subject, message } = req.body;
 
   if (!from_name || !from_email || !message) {
@@ -14,9 +22,9 @@ router.post('/send-inquiry', async (req, res) => {
   }
 
   try {
-    const data = await resend.emails.send({
-      from: 'Hospital Inquiry <onboarding@resend.dev>',
-      to: ['ac984939@gmail.com'], // Ensure this matches your Resend login email
+    await transporter.sendMail({
+      from: `"Hospital Inquiry" <${process.env.GMAIL_USER}>`,
+      to: 'ac984939@gmail.com',
       replyTo: from_email,
       subject: subject || `New Patient Inquiry from ${from_name}`,
       html: `
@@ -30,9 +38,9 @@ router.post('/send-inquiry', async (req, res) => {
       `,
     });
 
-    return res.status(200).json({ success: true, data });
+    return res.status(200).json({ success: true });
   } catch (error) {
-    console.error('Resend Error:', error);
+    console.error('Nodemailer Error:', error);
     return res.status(500).json({ success: false, error: 'Failed to send inquiry email.' });
   }
 });
