@@ -146,7 +146,7 @@ const LandingPage = () => {
             </div>
             <div className="space-y-3">
               <button 
-                onClick={() => navigate('/register')}
+                onClick={() => navigate('/process')}
                 className="inline-flex items-center gap-2 text-xs font-bold text-white bg-slate-900 px-4 py-2.5 rounded-full cursor-pointer hover:bg-slate-800"
               >
                 Our working process

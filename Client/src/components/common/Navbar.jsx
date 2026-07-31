@@ -69,49 +69,20 @@ const Navbar = () => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
-            <Link to="/" className="hover:text-blue-600 transition-colors">
-              Home
-            </Link>
-            <Link
-              to="/about"
-              // onClick={(e) => handleAnchorClick(e, "about")}
-              className="hover:text-blue-600 transition-colors"
-            >
-              About
-            </Link>
-            <Link to="/doctors" className="hover:text-blue-600 transition-colors">
-              Doctor
-            </Link>
-            {/* <a
-              href="/#process"
-              onClick={(e) => handleAnchorClick(e, "process")}
-              className="hover:text-blue-600 transition-colors"
-            >
-              How it works
-            </a> */}
-
+            <Link to="/" className="hover:text-blue-600 transition-colors">  Home </Link>
+            <Link to="/about" className="hover:text-blue-600 transition-colors">  About</Link>
+            <Link to="/doctors" className="hover:text-blue-600 transition-colors"> Doctor </Link>
+    
             <Link to="/process" className="hover:text-blue-600 transition-colors">How It work</Link>
 
-            <Link to="/contact" className="hover:text-blue-600 transition-colors">
-              Contact
-            </Link>
+            <Link to="/contact" className="hover:text-blue-600 transition-colors">  Contact</Link>
             
           </div>
 
           {/* Desktop Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              to="/login"
-              className="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors"
-            >
-              Log in
-            </Link>
-            <Link
-              to="/signup"
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-md shadow-blue-500/20"
-            >
-              Create an account
-            </Link>
+            <Link to="/login" className="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors"> Log in </Link>
+            <Link to="/signup" className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-md shadow-blue-500/20"> Create an account </Link>
           </div>
 
           {/* Mobile Hamburger Toggle */}

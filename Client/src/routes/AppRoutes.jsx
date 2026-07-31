@@ -15,20 +15,16 @@ import About from "../components/common/About";
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Main/>}/>
-      <Route path="/contact" element={<ContactUs/>}/>
-      <Route path="/doctors" element={<Doctor/>}/>
-      <Route path="/process" element={<HowItWork/>}/>
-      <Route path="/about" element={<About/>}/>
+      {/* Layout wrapper with Navbar and Footer */}
+      <Route path="/" element={<Main />}>
+        <Route index element={<LandingPage />} />
+        <Route path="contact" element={<ContactUs />} />
+        <Route path="doctors" element={<Doctor />} />
+        <Route path="process" element={<HowItWork />} />
+        <Route path="about" element={<About />} />
+      </Route>
 
-
-
-      {/* <Route path="/" element={<LandingPage/>}/>
-
-      <Route path="/contact" element={<ContactUs/>}/>
-      <Route path="/doctors" element={<Doctor/>}/>
-      <Route path="/process" element={<HowItWork/>}/>*/}
-      {/* Public Routes */}
+      {/* Public Auth Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} /> 
 
