@@ -1,35 +1,11 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
-import dns from 'node:dns';
 import express from 'express';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 const router = express.Router();
 
-let smtpHost = 'smtp.gmail.com';
-try {
-  const addresses = await dns.promises.resolve4('smtp.gmail.com');
-  if (addresses.length) smtpHost = addresses[0];
-} catch {
-  // fall back to the hostname
-}
-
-const transporter = nodemailer.createTransport({
-  host: smtpHost,
-  port: 587,
-  secure: false,
-  servername: 'smtp.gmail.com',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 60000,
-});
-
 router.post('/send-inquiry', async (req, res) => {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   const { from_name, from_email, subject, message } = req.body;
 
   if (!from_name || !from_email || !message) {
@@ -37,9 +13,9 @@ router.post('/send-inquiry', async (req, res) => {
   }
 
   try {
-    await transporter.sendMail({
-      from: `"Hospital Inquiry" <${process.env.GMAIL_USER}>`,
-      to: 'ac984939@gmail.com',
+    const { data, error } = await resend.emails.send({
+      from: 'Hospital Inquiry <onboarding@resend.dev>',
+      to: ['ac984939@gmail.com'],
       replyTo: from_email,
       subject: subject || `New Patient Inquiry from ${from_name}`,
       html: `
@@ -53,9 +29,11 @@ router.post('/send-inquiry', async (req, res) => {
       `,
     });
 
-    return res.status(200).json({ success: true });
+    if (error) throw new Error(error.message);
+
+    return res.status(200).json({ success: true, data });
   } catch (error) {
-    console.error('Nodemailer Error:', error);
+    console.error('Resend Error:', error);
     return res.status(500).json({ success: false, error: `Failed to send inquiry email: ${error.message}` });
   }
 });
