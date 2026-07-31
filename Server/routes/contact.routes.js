@@ -17,15 +17,15 @@ try {
 
 const transporter = nodemailer.createTransport({
   host: smtpHost,
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
   servername: 'smtp.gmail.com',
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
-  connectionTimeout: 20000,
-  greetingTimeout: 20000,
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
   socketTimeout: 60000,
 });
 
