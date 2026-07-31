@@ -41,28 +41,6 @@ const About = () => {
           </div>
         </div>
 
-        {/* How the System Works Section */}
-        <div className="mt-16 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">How the System Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-4">
-              <div className="text-blue-600 text-3xl font-bold mb-2">1</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Create an Account</h3>
-              <p className="text-gray-600 text-sm">Sign up easily to access your personal dashboard and manage appointments.</p>
-            </div>
-            <div className="text-center p-4">
-              <div className="text-blue-600 text-3xl font-bold mb-2">2</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Connect with Doctors</h3>
-              <p className="text-gray-600 text-sm">Browse expert doctors, view specialties, and book appointments effortlessly.</p>
-            </div>
-            <div className="text-center p-4">
-              <div className="text-blue-600 text-3xl font-bold mb-2">3</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Manage Care</h3>
-              <p className="text-gray-600 text-sm">Track medical records, review health updates, and receive continuous support.</p>
-            </div>
-          </div>
-        </div>
-
         {/* Hospital Infrastructure & Location Stats */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
