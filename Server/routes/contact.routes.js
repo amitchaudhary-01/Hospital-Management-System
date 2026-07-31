@@ -56,7 +56,7 @@ router.post('/send-inquiry', async (req, res) => {
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error('Nodemailer Error:', error);
-    return res.status(500).json({ success: false, error: 'Failed to send inquiry email.' });
+    return res.status(500).json({ success: false, error: `Failed to send inquiry email: ${error.message}` });
   }
 });
 
