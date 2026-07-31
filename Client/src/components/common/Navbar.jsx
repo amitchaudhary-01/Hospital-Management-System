@@ -123,7 +123,6 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/about"
-                onClick={(e) => handleAnchorClick(e, "about")}
                 className="px-3 py-2.5 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition-colors"
               >
                 About
@@ -137,7 +136,6 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/process"
-                onClick={(e) => handleAnchorClick(e, "process")}
                 className="px-3 py-2.5 rounded-lg hover:bg-slate-100 hover:text-blue-600 transition-colors"
               >
                 How it works
