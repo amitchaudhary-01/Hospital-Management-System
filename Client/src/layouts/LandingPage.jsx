@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import API from '../api/axios'; // Adjust path to your axios instance
+import API from '../api/axios'; 
+import Loader from '../components/common/Loader'; // Import your loader component
 import { 
   UserCheck, 
   MessageSquare, 
@@ -14,8 +15,6 @@ import {
   Activity,
   Stethoscope
 } from 'lucide-react';
-// import Footer from '../components/common/Footer';
-// import Navbar from '../components/common/Navbar';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -27,15 +26,13 @@ const LandingPage = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  // Fetch real database data for Landing Page
   useEffect(() => {
     const fetchLandingData = async () => {
       try {
         setLoading(true);
-        // Fetch public/admin data endpoints
         const [doctorsRes, statsRes] = await Promise.allSettled([
           API.get('/admin/doctors'),
-          API.get('/admin/dashboard-stats') // or fetch individual endpoint lists if stats endpoint is not yet present
+          API.get('/admin/dashboard-stats')
         ]);
 
         if (doctorsRes.status === 'fulfilled' && doctorsRes.value.data?.doctors) {
@@ -55,10 +52,15 @@ const LandingPage = () => {
     fetchLandingData();
   }, []);
 
+  // Display the separate Loader component while data is loading
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       
-      {/* Injecting local keyframes for marquee animation to make it work out-of-the-box */}
+      {/* Injecting local keyframes for marquee animation */}
       <style>{`
         @keyframes marqueeScroll {
           0% { transform: translateX(0%); }
@@ -68,42 +70,6 @@ const LandingPage = () => {
           animation: marqueeScroll 20s linear infinite;
         }
       `}</style>
-
-      {/* ================= NAVBAR ================= */}
-      {/* <nav className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-lg">
-            +
-          </div>
-          <span className="text-xl font-bold tracking-tight text-slate-900">
-            Hospital<p className='font-bold text-blue-500'>Care</p>
-          </span>
-        </div>
-
-        <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
-          <a href="#about" className="hover:text-sky-600 transition-colors">About</a>
-          <a href="#doctors" className="hover:text-sky-600 transition-colors">Doctor</a>
-          <a href="#process" className="hover:text-sky-600 transition-colors">How it works</a>
-          <a href="#contact" className="hover:text-sky-600 transition-colors">Contact</a>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link
-            to="/login"
-            className="px-5 py-2 text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors"
-          >
-            Log in
-          </Link>
-          <Link
-            to="/signup"
-            className="px-5 py-2.5 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-full transition-all shadow-xs"
-          >
-            Create an account
-          </Link>
-        </div>
-      </nav> */}
-
-      {/* <Navbar/> */}
 
       {/* ================= HERO SECTION ================= */}
       <section className="max-w-7xl mx-auto px-6 py-6">
@@ -128,7 +94,6 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Hero Illustration Placeholder / Banner Image */}
           <div className="w-full md:w-1/2 flex justify-center items-center">
             <div className="relative w-full max-w-md h-64 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center p-6 text-center">
               <div className="space-y-3">
@@ -144,8 +109,6 @@ const LandingPage = () => {
       {/* ================= STATS & PROOF SECTION ================= */}
       <section id="about" className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-          
-          {/* Left Text Card */}
           <div className="flex flex-col justify-between space-y-4 pr-4">
             <div>
               <h2 className="text-2xl font-bold text-slate-900 leading-snug">
@@ -167,7 +130,6 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Center Card: Clients / Active Patients */}
           <div className="bg-slate-100 rounded-3xl p-6 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500">Our Clients</span>
@@ -190,7 +152,6 @@ const LandingPage = () => {
             </Link>
           </div>
 
-          {/* Right Card: Success Rate Widget */}
           <div className="bg-slate-100 rounded-3xl p-6 flex flex-col items-center justify-center text-center">
             <div className="relative w-24 h-24 rounded-full border-4 border-sky-400 border-t-slate-200 flex items-center justify-center mb-4">
               <span className="text-xl font-extrabold text-slate-900">88%</span>
@@ -198,26 +159,25 @@ const LandingPage = () => {
             <h4 className="text-sm font-bold text-slate-800">Healing Success</h4>
             <p className="text-xs text-slate-400 mt-1">Verified patient satisfaction and recoveries</p>
           </div>
-
         </div>
       </section>
 
-      {/* ================= BRAND BANNER (WORKING MARQUEE) ================= */}
+      {/* ================= BRAND BANNER ================= */}
       <section className="max-w-7xl mx-auto px-6 py-4">
         <div className="bg-[#D8EE5B] rounded-2xl py-6 overflow-hidden relative flex whitespace-nowrap">
           <div className="flex min-w-full animate-marquee-custom items-center justify-around gap-16 text-slate-900 font-bold text-lg px-8 shrink-0">
             <span className="opacity-80 hover:opacity-100 transition-opacity">omada</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood </span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood</span>
             <span className="opacity-80 hover:opacity-100 transition-opacity">samsara</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1"> Firstbase</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity"> EXODUS</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1">Firstbase</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">EXODUS</span>
           </div>
           <div className="flex min-w-full animate-marquee-custom items-center justify-around gap-16 text-slate-900 font-bold text-lg px-8 shrink-0" aria-hidden="true">
             <span className="opacity-80 hover:opacity-100 transition-opacity">omada</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood </span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood</span>
             <span className="opacity-80 hover:opacity-100 transition-opacity">samsara</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1"> Firstbase</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity"> EXODUS</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1">Firstbase</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">EXODUS</span>
           </div>
         </div>
       </section>
@@ -230,7 +190,6 @@ const LandingPage = () => {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
-          {/* Step 1 */}
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 mb-4">
               <UserCheck className="w-5 h-5" />
@@ -241,7 +200,6 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Step 2 (Highlighted Active) */}
           <div className="bg-sky-500 text-white p-6 rounded-2xl shadow-lg text-left">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white mb-4">
               <MessageSquare className="w-5 h-5" />
@@ -252,7 +210,6 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Step 3 */}
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 mb-4">
               <Calendar className="w-5 h-5" />
@@ -263,7 +220,6 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Step 4 */}
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 mb-4">
               <CheckCircle2 className="w-5 h-5" />
@@ -295,7 +251,6 @@ const LandingPage = () => {
           </div>
         </div>
 
-        {/* Dynamic Doctor Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
           {doctors.length > 0 ? (
             doctors.map((doc) => (
@@ -325,7 +280,6 @@ const LandingPage = () => {
               </div>
             ))
           ) : (
-            // Fallback UI matching layout when fetching or empty
             Array.from({ length: 4 }).map((_, index) => (
               <div key={index} className="bg-white p-4 rounded-2xl border border-slate-100 text-center">
                 <div className="w-full h-44 bg-slate-100 rounded-xl mb-3 flex items-center justify-center">
@@ -338,8 +292,6 @@ const LandingPage = () => {
           )}
         </div>
       </section>
-
-{/* <Footer/> */}
 
     </div>
   );
