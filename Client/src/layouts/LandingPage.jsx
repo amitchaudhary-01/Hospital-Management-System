@@ -207,17 +207,17 @@ const LandingPage = () => {
         <div className="bg-[#D8EE5B] rounded-2xl py-6 overflow-hidden relative flex whitespace-nowrap">
           <div className="flex min-w-full animate-marquee-custom items-center justify-around gap-16 text-slate-900 font-bold text-lg px-8 shrink-0">
             <span className="opacity-80 hover:opacity-100 transition-opacity">omada</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood 🖊</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood </span>
             <span className="opacity-80 hover:opacity-100 transition-opacity">samsara</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1">❖ Firstbase</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity">✳ EXODUS</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1"> Firstbase</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity"> EXODUS</span>
           </div>
           <div className="flex min-w-full animate-marquee-custom items-center justify-around gap-16 text-slate-900 font-bold text-lg px-8 shrink-0" aria-hidden="true">
             <span className="opacity-80 hover:opacity-100 transition-opacity">omada</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood 🖊</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood </span>
             <span className="opacity-80 hover:opacity-100 transition-opacity">samsara</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1">❖ Firstbase</span>
-            <span className="opacity-80 hover:opacity-100 transition-opacity">✳ EXODUS</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1"> Firstbase</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity"> EXODUS</span>
           </div>
         </div>
       </section>
