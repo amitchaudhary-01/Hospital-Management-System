@@ -8,7 +8,7 @@ const HowItWork = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center">
-          <h1 className="text-xl font-extrabold text-gray-900 sm:text-5xl">
+          <h1 className="text-xl font-extrabold text-gray-900 sm:text-3xl">
             How <span className="text-blue-600">HospitalCare</span> Works
           </h1>
           <p className="mt-4 text-l text-gray-600 max-w-2xl mx-auto">

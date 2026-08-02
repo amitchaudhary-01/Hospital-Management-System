@@ -58,6 +58,17 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       
+      {/* Injecting local keyframes for marquee animation to make it work out-of-the-box */}
+      <style>{`
+        @keyframes marqueeScroll {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee-custom {
+          animation: marqueeScroll 20s linear infinite;
+        }
+      `}</style>
+
       {/* ================= NAVBAR ================= */}
       {/* <nav className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -191,14 +202,23 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ================= BRAND BANNER ================= */}
+      {/* ================= BRAND BANNER (WORKING MARQUEE) ================= */}
       <section className="max-w-7xl mx-auto px-6 py-4">
-        <div className="bg-[#D8EE5B] rounded-2xl py-6 px-8 flex flex-wrap items-center justify-around gap-6 text-slate-900 font-bold text-lg">
-          <span className="opacity-80 hover:opacity-100 transition-opacity">omada</span>
-          <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood 🖊</span>
-          <span className="opacity-80 hover:opacity-100 transition-opacity">samsara</span>
-          <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1">❖ Firstbase</span>
-          <span className="opacity-80 hover:opacity-100 transition-opacity">✳ EXODUS</span>
+        <div className="bg-[#D8EE5B] rounded-2xl py-6 overflow-hidden relative flex whitespace-nowrap">
+          <div className="flex min-w-full animate-marquee-custom items-center justify-around gap-16 text-slate-900 font-bold text-lg px-8 shrink-0">
+            <span className="opacity-80 hover:opacity-100 transition-opacity">omada</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood 🖊</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">samsara</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1">❖ Firstbase</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">✳ EXODUS</span>
+          </div>
+          <div className="flex min-w-full animate-marquee-custom items-center justify-around gap-16 text-slate-900 font-bold text-lg px-8 shrink-0" aria-hidden="true">
+            <span className="opacity-80 hover:opacity-100 transition-opacity">omada</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">Robinhood 🖊</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">samsara</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity flex items-center gap-1">❖ Firstbase</span>
+            <span className="opacity-80 hover:opacity-100 transition-opacity">✳ EXODUS</span>
+          </div>
         </div>
       </section>
 
@@ -318,7 +338,6 @@ const LandingPage = () => {
           )}
         </div>
       </section>
-
 
 {/* <Footer/> */}
 
