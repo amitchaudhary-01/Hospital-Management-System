@@ -26,9 +26,7 @@ const AdminLayout = () => {
       navigate("/login");
     } catch (error) {
       console.error("Logout Error:", error);
-      toast.error(
-        error.response?.data?.message || "Logout failed"
-      );
+      toast.error(error.response?.data?.message || "Logout failed");
     }
   };
 
@@ -36,31 +34,11 @@ const AdminLayout = () => {
 
   // Admin Navigation Items
   const navItems = [
-    {
-      name: "Dashboard",
-      path: "/admin/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      name: "All Doctors",
-      path: "/admin/doctors",
-      icon: Stethoscope,
-    },
-    {
-      name: "All Patients",
-      path: "/admin/patients",
-      icon: Users,
-    },
-    {
-      name: "All Appointments",
-      path: "/admin/appointments",
-      icon: CalendarDays,
-    },
-    {
-        name: "Create Doctor",
-        path:"/admin/doctor",
-        icon: UserRoundPlus
-    }
+    { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "All Doctors", path: "/admin/doctors", icon: Stethoscope },
+    { name: "All Patients", path: "/admin/patients", icon: Users },
+    { name: "All Appointments", path: "/admin/appointments", icon: CalendarDays },
+    { name: "Create Doctor", path: "/admin/doctor", icon: UserRoundPlus },
   ];
 
   // Dynamic NavLink Styling

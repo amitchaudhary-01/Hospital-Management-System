@@ -515,7 +515,7 @@ const AllDoctors = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="Dr. John Doe"
+                    placeholder="Enter Name"
                     {...register('name', { required: 'Full name is required' })}
                     className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs text-slate-800 focus:outline-none focus:bg-white ${
                       errors.name ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-blue-500'
