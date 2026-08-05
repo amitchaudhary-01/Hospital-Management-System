@@ -72,9 +72,11 @@ const LandingPage = () => {
       <section className="max-w-7xl mx-auto px-6 py-6">
         <div 
           data-aos="fade-up" 
+          data-aos-once="false"
+          data-aos-mirror="true"
           className="bg-slate-100 rounded-3xl p-8 md:p-14 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10"
         >
-          <div className="max-w-xl space-y-6 z-10" data-aos="fade-right" data-aos-delay="200">
+          <div className="max-w-xl space-y-6 z-10" data-aos="fade-right" data-aos-delay="200" data-aos-once="false" data-aos-mirror="true">
             <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
               Empowering Lives Through Health 💊
             </h1>
@@ -94,7 +96,7 @@ const LandingPage = () => {
             </div>
           </div>
 
-          <div className="w-full md:w-1/2 flex justify-center items-center" data-aos="zoom-in" data-aos-delay="400">
+          <div className="w-full md:w-1/2 flex justify-center items-center" data-aos="zoom-in" data-aos-delay="400" data-aos-once="false" data-aos-mirror="true">
             <div className="relative w-full max-w-md h-64 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center p-6 text-center">
               <div className="space-y-3">
                 <Stethoscope className="w-16 h-16 text-sky-500 mx-auto" />
@@ -110,7 +112,7 @@ const LandingPage = () => {
       <section id="about" className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           
-          <div className="flex flex-col justify-between space-y-4 pr-4" data-aos="fade-right">
+          <div className="flex flex-col justify-between space-y-4 pr-4" data-aos="fade-right" data-aos-once="false" data-aos-mirror="true">
             <div>
               <h2 className="text-2xl font-bold text-slate-900 leading-snug">
                 Your Bridge to Better Health <br />
@@ -131,7 +133,7 @@ const LandingPage = () => {
             </div>
           </div>
 
-          <div className="bg-slate-100 rounded-3xl p-6 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="150">
+          <div className="bg-slate-100 rounded-3xl p-6 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="150" data-aos-once="false" data-aos-mirror="true">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500">Our Clients</span>
               <div className="flex -space-x-2">
@@ -153,7 +155,7 @@ const LandingPage = () => {
             </Link>
           </div>
 
-          <div className="bg-slate-100 rounded-3xl p-6 flex flex-col items-center justify-center text-center" data-aos="fade-left" data-aos-delay="300">
+          <div className="bg-slate-100 rounded-3xl p-6 flex flex-col items-center justify-center text-center" data-aos="fade-left" data-aos-delay="300" data-aos-once="false" data-aos-mirror="true">
             <div className="relative w-24 h-24 rounded-full border-4 border-sky-400 border-t-slate-200 flex items-center justify-center mb-4">
               <span className="text-xl font-extrabold text-slate-900">88%</span>
             </div>
@@ -165,7 +167,7 @@ const LandingPage = () => {
       </section>
 
       {/* ================= BRAND BANNER ================= */}
-      <section className="max-w-7xl mx-auto px-6 py-4" data-aos="fade-in">
+      <section className="max-w-7xl mx-auto px-6 py-4" data-aos="fade-in" data-aos-once="false" data-aos-mirror="true">
         <div className="bg-[#D8EE5B] rounded-2xl py-6 overflow-hidden relative flex whitespace-nowrap">
           <div className="flex min-w-full animate-marquee-custom items-center justify-around gap-16 text-slate-900 font-bold text-lg px-8 shrink-0">
             <span className="opacity-80 hover:opacity-100 transition-opacity">omada</span>
@@ -186,7 +188,7 @@ const LandingPage = () => {
 
       {/* ================= 4 STEPS SECTION ================= */}
       <section id="process" className="max-w-7xl mx-auto px-6 py-16 text-center">
-        <div data-aos="fade-up">
+        <div data-aos="fade-up" data-aos-once="false" data-aos-mirror="true">
           <h2 className="text-3xl font-extrabold text-slate-900">4 Easy Steps And Get Your Solution</h2>
           <p className="text-xs text-slate-400 max-w-md mx-auto mt-2 leading-relaxed">
             Navigating Health Together: Your Trusted Medical Resource. Medicine Meets Technology Your Online Health Hub.
@@ -195,7 +197,7 @@ const LandingPage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
           
-          <div data-aos="fade-up" data-aos-delay="100" className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
+          <div data-aos="fade-up" data-aos-delay="100" data-aos-once="false" data-aos-mirror="true" className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 mb-4">
               <UserCheck className="w-5 h-5" />
             </div>
@@ -205,7 +207,7 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div data-aos="fade-up" data-aos-delay="200" className="bg-sky-500 text-white p-6 rounded-2xl shadow-lg text-left">
+          <div data-aos="fade-up" data-aos-delay="200" data-aos-once="false" data-aos-mirror="true" className="bg-sky-500 text-white p-6 rounded-2xl shadow-lg text-left">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white mb-4">
               <MessageSquare className="w-5 h-5" />
             </div>
@@ -215,7 +217,7 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div data-aos="fade-up" data-aos-delay="300" className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
+          <div data-aos="fade-up" data-aos-delay="300" data-aos-once="false" data-aos-mirror="true" className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 mb-4">
               <Calendar className="w-5 h-5" />
             </div>
@@ -225,7 +227,7 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div data-aos="fade-up" data-aos-delay="400" className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
+          <div data-aos="fade-up" data-aos-delay="400" data-aos-once="false" data-aos-mirror="true" className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs text-left hover:shadow-md transition-shadow">
             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 mb-4">
               <CheckCircle2 className="w-5 h-5" />
             </div>
@@ -240,7 +242,7 @@ const LandingPage = () => {
 
       {/* ================= MEET OUR DOCTORS ================= */}
       <section id="doctors" className="max-w-7xl mx-auto px-6 py-12">
-        <div className="flex items-end justify-between mb-8" data-aos="fade-up">
+        <div className="flex items-end justify-between mb-8" data-aos="fade-up" data-aos-once="false" data-aos-mirror="true">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600">Meet Our Doctors</span>
             <h2 className="text-2xl font-bold text-slate-900 mt-1">
@@ -263,6 +265,8 @@ const LandingPage = () => {
               <div 
                 key={doc._id} 
                 data-aos="zoom-in"
+                data-aos-once="false"
+                data-aos-mirror="true"
                 data-aos-delay={(index % 4) * 100}
                 className="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs hover:shadow-md transition-all text-center group cursor-pointer"
                 onClick={() => navigate('/auth/login')}
@@ -292,6 +296,8 @@ const LandingPage = () => {
               <div 
                 key={index} 
                 data-aos="zoom-in" 
+                data-aos-once="false"
+                data-aos-mirror="true"
                 data-aos-delay={index * 100}
                 className="bg-white p-4 rounded-2xl border border-slate-100 text-center"
               >
