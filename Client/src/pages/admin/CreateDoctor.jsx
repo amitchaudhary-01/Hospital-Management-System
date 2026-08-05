@@ -58,7 +58,7 @@ const CreateDoctor = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+      <div data-aos="fade-down" className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2.5">
             <UserPlus className="w-6 h-6 text-sky-600" />
@@ -71,7 +71,7 @@ const CreateDoctor = () => {
       </div>
 
       {/* Form Body */}
-      <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+      <div data-aos="fade-up" data-aos-delay="100" className="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-medium text-slate-700">
           
           {/* Full Name */}

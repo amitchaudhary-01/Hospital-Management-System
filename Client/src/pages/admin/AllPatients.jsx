@@ -199,9 +199,15 @@ const AllPatients = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
+    <div 
+      className="w-full max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6"
+      data-aos="fade-up"
+    >
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div 
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs"
+        data-aos="fade-down"
+      >
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2.5">
             <Users className="w-5 h-5 sm:w-6 sm:h-6 text-sky-600 shrink-0" />
@@ -233,7 +239,7 @@ const AllPatients = () => {
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs" data-aos="fade">
           <RefreshCw className="w-7 h-7 sm:w-8 sm:h-8 text-sky-600 animate-spin mx-auto mb-3" />
           <p className="text-slate-500 text-sm font-medium">Loading patients list...</p>
         </div>
@@ -241,7 +247,7 @@ const AllPatients = () => {
 
       {/* Error State */}
       {error && (
-        <div className="bg-rose-50 rounded-2xl border border-rose-200 p-4 sm:p-6 flex items-center gap-3 text-rose-700">
+        <div className="bg-rose-50 rounded-2xl border border-rose-200 p-4 sm:p-6 flex items-center gap-3 text-rose-700" data-aos="zoom-in">
           <AlertCircle className="w-5 h-5 shrink-0" />
           <p className="text-xs sm:text-sm font-medium">Error: {error}</p>
         </div>
@@ -249,7 +255,7 @@ const AllPatients = () => {
 
       {/* Empty State */}
       {!loading && !error && filteredPatients.length === 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs" data-aos="fade">
           <Users className="w-10 h-10 sm:w-12 sm:h-12 text-slate-300 mx-auto mb-3" />
           <h3 className="text-sm sm:text-base font-semibold text-slate-700">No Patients Found</h3>
           <p className="text-xs text-slate-400 mt-1">
@@ -260,12 +266,17 @@ const AllPatients = () => {
 
       {/* Content Container */}
       {!loading && !error && filteredPatients.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden" data-aos="fade-up">
           
           {/* MOBILE CARDS VIEW */}
           <div className="block md:hidden divide-y divide-slate-100">
-            {currentPatients.map((patient) => (
-              <div key={patient._id} className="p-4 space-y-3">
+            {currentPatients.map((patient, index) => (
+              <div 
+                key={patient._id} 
+                className="p-4 space-y-3"
+                data-aos="fade-up"
+                data-aos-delay={index * 50}
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 font-bold text-xs shrink-0">
@@ -352,8 +363,13 @@ const AllPatients = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                {currentPatients.map((patient) => (
-                  <tr key={patient._id} className="hover:bg-slate-50/60 transition-colors duration-150">
+                {currentPatients.map((patient, index) => (
+                  <tr 
+                    key={patient._id} 
+                    className="hover:bg-slate-50/60 transition-colors duration-150"
+                    data-aos="fade-up"
+                    data-aos-delay={index * 50}
+                  >
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 font-bold text-xs shrink-0">
@@ -461,6 +477,7 @@ const AllPatients = () => {
           <div 
             onClick={(e) => e.stopPropagation()} 
             className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 max-h-[90vh] overflow-y-auto"
+            data-aos="zoom-in"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 sm:pb-4">
               <div className="flex items-center gap-2.5">
@@ -530,6 +547,7 @@ const AllPatients = () => {
           <div 
             onClick={(e) => e.stopPropagation()} 
             className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 max-h-[90vh] overflow-y-auto"
+            data-aos="zoom-in"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 sm:pb-4">
               <h3 className="text-base sm:text-lg font-bold text-slate-800">Edit Patient Details</h3>
@@ -639,6 +657,7 @@ const AllPatients = () => {
           <div 
             onClick={(e) => e.stopPropagation()} 
             className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4"
+            data-aos="zoom-in"
           >
             <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
               <Trash2 className="w-5 h-5" />

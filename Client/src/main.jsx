@@ -7,14 +7,17 @@ import App from "./App";
 import "./index.css";
 
 import { AuthProvider } from "./context/AuthContext";
+import AOSProvider from "./components/AOSProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <Toaster position="top-right" />
-        <App />
-      </AuthProvider>
+      <AOSProvider>
+        <AuthProvider>
+          <Toaster position="top-right" />
+          <App />
+        </AuthProvider>
+      </AOSProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

@@ -70,7 +70,10 @@ const Prescriptions = () => {
         {/* =================================
             PAGE HEADER
         ================================= */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+        <div
+          data-aos="fade-down"
+          className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm"
+        >
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-sky-100 text-sky-700">
               <Pill className="w-6 h-6" />
@@ -94,7 +97,7 @@ const Prescriptions = () => {
               LEFT: PRESCRIPTION FORM
           ================================= */}
           {appointmentId && (
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-5" data-aos="fade-right" data-aos-delay="100">
               <PrescriptionForm
                 appointmentId={appointmentId}
                 onSuccess={() => fetchPrescriptions(currentPage)}
@@ -106,6 +109,8 @@ const Prescriptions = () => {
               RIGHT: PRESCRIPTION LIST
           ================================= */}
           <div
+            data-aos="fade-left"
+            data-aos-delay="200"
             className={
               appointmentId ? "lg:col-span-7" : "lg:col-span-12"
             }

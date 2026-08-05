@@ -22,7 +22,7 @@ const Appointments = () => {
   const [pagination, setPagination] = useState({
     totalCount: 0,
     totalPages: 1,
-    pageSize: 6,
+    pageSize: 4,
     hasNextPage: false,
     hasPrevPage: false,
   });
@@ -30,7 +30,7 @@ const Appointments = () => {
   const fetchAppointments = async (page = 1) => {
     try {
       setLoading(true);
-      const res = await API.get(`/appointments/doctor?page=${page}&limit=6`, {
+      const res = await API.get(`/appointments/doctor?page=${page}&limit=4`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
@@ -94,7 +94,10 @@ const Appointments = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div
+        data-aos="fade-down"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Appointments Directory
@@ -110,7 +113,7 @@ const Appointments = () => {
 
       {/* Empty State */}
       {!Array.isArray(appointments) || appointments.length === 0 ? (
-        <div className="text-center py-16 bg-white border border-slate-200/80 rounded-2xl shadow-xs">
+        <div className="text-center py-16 bg-white border border-slate-200/80 rounded-2xl shadow-xs" data-aos="fade-in">
           <AlertCircle className="w-10 h-10 text-slate-300 mx-auto mb-3" />
           <h3 className="text-base font-bold text-slate-800">No Appointments Found</h3>
           <p className="text-xs text-slate-400 mt-1">You currently have no scheduled appointments.</p>
@@ -119,7 +122,7 @@ const Appointments = () => {
         /* Appointment Cards Grid & Pagination */
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {appointments.map((appt) => {
+            {appointments.map((appt, index) => {
               const patient = appt.patientId || appt.patient || {};
               const patientName = patient.name || appt.patientName || "N/A";
               const contact = patient.phone || patient.contactNumber || appt.contactNumber || "N/A";
@@ -129,6 +132,8 @@ const Appointments = () => {
               return (
                 <div
                   key={appt._id}
+                  data-aos="fade-up"
+                  data-aos-delay={(index % 3) * 100}
                   className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs hover:shadow-lg hover:border-sky-300 transition-all duration-300 flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-3">
@@ -215,7 +220,7 @@ const Appointments = () => {
           </div>
 
           {/* Reusable Pagination Component Container */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+          <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden" data-aos="fade-up" data-aos-delay="150">
             <Pagination
               currentPage={currentPage}
               totalPages={pagination.totalPages}

@@ -179,8 +179,12 @@ const AllAppointment = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 px-3 sm:px-6 py-4">
+      
       {/* Header & Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div 
+        data-aos="fade-down"
+        className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs"
+      >
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2.5">
             <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-sky-600 shrink-0" />
@@ -227,7 +231,7 @@ const AllAppointment = () => {
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+        <div data-aos="fade-in" className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
           <RefreshCw className="w-8 h-8 text-sky-600 animate-spin mx-auto mb-3" />
           <p className="text-slate-500 text-sm font-medium">Loading appointments...</p>
         </div>
@@ -235,7 +239,7 @@ const AllAppointment = () => {
 
       {/* Error State */}
       {error && (
-        <div className="bg-rose-50 rounded-2xl border border-rose-200 p-4 sm:p-6 flex items-center gap-3 text-rose-700">
+        <div data-aos="fade-in" className="bg-rose-50 rounded-2xl border border-rose-200 p-4 sm:p-6 flex items-center gap-3 text-rose-700">
           <AlertCircle className="w-5 h-5 shrink-0" />
           <p className="text-sm font-medium">Error: {error}</p>
         </div>
@@ -243,7 +247,7 @@ const AllAppointment = () => {
 
       {/* Empty State */}
       {!loading && !error && appointments.length === 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+        <div data-aos="fade-in" className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
           <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <h3 className="text-base font-semibold text-slate-700">No Appointments Found</h3>
           <p className="text-xs text-slate-400 mt-1">
@@ -256,11 +260,11 @@ const AllAppointment = () => {
 
       {/* Appointments List Section */}
       {!loading && !error && appointments.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div data-aos="fade-up" className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           
           {/* MOBILE / TABLET CARD VIEW */}
           <div className="block md:hidden divide-y divide-slate-100">
-            {appointments.map((apt) => {
+            {appointments.map((apt, index) => {
               const patient = apt.patient || apt.userData || {};
               const doctor = apt.doctor || apt.docData || {};
 
@@ -273,7 +277,7 @@ const AllAppointment = () => {
               const normStatus = (apt.status || '').toUpperCase();
 
               return (
-                <div key={apt._id} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
+                <div key={apt._id} data-aos="fade-up" data-aos-delay={index * 50} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs shrink-0">
@@ -368,7 +372,7 @@ const AllAppointment = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                {appointments.map((apt) => {
+                {appointments.map((apt, index) => {
                   const patient = apt.patient || apt.userData || {};
                   const doctor = apt.doctor || apt.docData || {};
 
@@ -381,7 +385,7 @@ const AllAppointment = () => {
                   const normStatus = (apt.status || '').toUpperCase();
 
                   return (
-                    <tr key={apt._id} className="hover:bg-slate-50/60 transition-colors duration-150">
+                    <tr key={apt._id} data-aos="fade-up" data-aos-delay={index * 50} className="hover:bg-slate-50/60 transition-colors duration-150">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs shrink-0">
@@ -508,7 +512,7 @@ const AllAppointment = () => {
       {/* APPOINTMENT DETAILS MODAL */}
       {selectedAppointment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 my-8">
+          <div data-aos="zoom-in" data-aos-duration="200" className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-5 sm:p-6 space-y-4 my-8">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-slate-800">Appointment Details</h3>
@@ -583,7 +587,7 @@ const AllAppointment = () => {
       {/* DELETE CONFIRMATION MODAL */}
       {appointmentToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4">
+          <div data-aos="zoom-in" data-aos-duration="200" className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4">
             <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shrink-0">
               <ShieldAlert className="w-5 h-5" />
             </div>

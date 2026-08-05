@@ -208,7 +208,10 @@ const Dashboard = () => {
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-5 sm:space-y-7">
         
         {/* WELCOME BANNER */}
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md shadow-sky-500/10 p-5 sm:p-7 md:p-9 lg:p-10">
+        <section
+          data-aos="fade-down"
+          className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md shadow-sky-500/10 p-5 sm:p-7 md:p-9 lg:p-10"
+        >
           <div className="absolute -right-16 -top-16 w-60 h-60 sm:w-80 sm:h-80 rounded-full bg-white/10 blur-2xl pointer-events-none" />
           <div className="absolute -right-10 -bottom-20 w-64 h-64 rounded-full bg-indigo-500/20 blur-xl pointer-events-none" />
 
@@ -254,6 +257,8 @@ const Dashboard = () => {
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             <div
               onClick={() => navigate("/doctor/appointments")}
+              data-aos="fade-up"
+              data-aos-delay="0"
               className="bg-white p-4 sm:p-5 lg:p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all duration-200 flex items-center gap-4 cursor-pointer"
             >
               <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
@@ -269,6 +274,8 @@ const Dashboard = () => {
 
             <div
               onClick={() => navigate("/doctor/appointments")}
+              data-aos="fade-up"
+              data-aos-delay="100"
               className="bg-white p-4 sm:p-5 lg:p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 transition-all duration-200 flex items-center gap-4 cursor-pointer"
             >
               <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
@@ -282,6 +289,8 @@ const Dashboard = () => {
 
             <div
               onClick={() => navigate("/doctor/appointments")}
+              data-aos="fade-up"
+              data-aos-delay="200"
               className="bg-white p-4 sm:p-5 lg:p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-200 flex items-center gap-4 cursor-pointer sm:col-span-2 lg:col-span-1"
             >
               <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
@@ -296,7 +305,10 @@ const Dashboard = () => {
         )}
 
         {/* TODAY'S SCHEDULE */}
-        <section className="bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl shadow-xs overflow-hidden">
+        <section
+          data-aos="fade-up"
+          className="bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl shadow-xs overflow-hidden"
+        >
           <div className="p-4 sm:p-6 border-b border-slate-100">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>

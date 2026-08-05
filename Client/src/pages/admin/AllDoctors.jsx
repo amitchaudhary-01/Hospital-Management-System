@@ -226,7 +226,10 @@ const AllDoctors = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 px-3 sm:px-6 py-4">
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div 
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs"
+        data-aos="fade-down"
+      >
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2.5">
             <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
@@ -264,7 +267,10 @@ const AllDoctors = () => {
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+        <div 
+          data-aos="fade-in"
+          className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs"
+        >
           <RefreshCw className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
           <p className="text-slate-500 text-sm font-medium">Loading doctors list...</p>
         </div>
@@ -272,7 +278,10 @@ const AllDoctors = () => {
 
       {/* Error State */}
       {error && (
-        <div className="bg-rose-50 rounded-2xl border border-rose-200 p-4 sm:p-6 flex items-center gap-3 text-rose-700">
+        <div 
+          data-aos="fade-in"
+          className="bg-rose-50 rounded-2xl border border-rose-200 p-4 sm:p-6 flex items-center gap-3 text-rose-700"
+        >
           <AlertCircle className="w-5 h-5 shrink-0" />
           <p className="text-xs sm:text-sm font-medium">Error: {error}</p>
         </div>
@@ -280,7 +289,10 @@ const AllDoctors = () => {
 
       {/* Empty State */}
       {!loading && !error && filteredDoctors.length === 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs">
+        <div 
+          data-aos="zoom-in"
+          className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-xs"
+        >
           <Stethoscope className="w-10 h-10 sm:w-12 sm:h-12 text-slate-300 mx-auto mb-3" />
           <h3 className="text-sm sm:text-base font-semibold text-slate-700">No Doctors Found</h3>
           <p className="text-xs text-slate-400 mt-1">
@@ -294,9 +306,11 @@ const AllDoctors = () => {
         <div className="space-y-4">
           {/* MOBILE VIEW: Card Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
-            {paginatedDoctors.map((doc) => (
+            {paginatedDoctors.map((doc, index) => (
               <div 
-                key={doc._id} 
+                key={doc._id}
+                data-aos="fade-up"
+                data-aos-delay={index * 50}
                 className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3.5 flex flex-col justify-between"
               >
                 <div className="space-y-3">
@@ -376,7 +390,10 @@ const AllDoctors = () => {
           </div>
 
           {/* DESKTOP VIEW: Table */}
-          <div className="hidden md:block bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div 
+            data-aos="fade-up"
+            className="hidden md:block bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden"
+          >
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -389,8 +406,8 @@ const AllDoctors = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                  {paginatedDoctors.map((doc) => (
-                    <tr key={doc._id} className="hover:bg-slate-50/60 transition-colors duration-150">
+                  {paginatedDoctors.map((doc, index) => (
+                    <tr key={doc._id} data-aos="fade-up" data-aos-delay={index * 50} className="hover:bg-slate-50/60 transition-colors duration-150">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
@@ -456,7 +473,7 @@ const AllDoctors = () => {
               </table>
             </div>
 
-            {/* Pagination for Desktop (Inside Card Container) */}
+            {/* Pagination for Desktop */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -484,10 +501,11 @@ const AllDoctors = () => {
       {/* CREATE / EDIT MODAL */}
       {(isAddModalOpen || isEditModalOpen) && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto animate-fadeIn"
           onClick={closeModal}
         >
           <div 
+            data-aos="zoom-in"
             className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-4 sm:p-6 space-y-4 sm:space-y-5 my-8"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
@@ -637,10 +655,11 @@ const AllDoctors = () => {
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteModalOpen && selectedDoctor && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn"
           onClick={closeModal}
         >
           <div 
+            data-aos="zoom-in"
             className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 sm:p-6 space-y-4"
             onClick={(e) => e.stopPropagation()}
             role="dialog"

@@ -22,7 +22,6 @@ const AdminDashboard = () => {
   const [error, setError] = useState("");
   const [timeRange, setTimeRange] = useState("30d");
 
-  // Helper function to calculate time-specific greeting
   const getDynamicGreeting = () => {
     const currentHour = new Date().getHours();
     
@@ -113,7 +112,10 @@ const AdminDashboard = () => {
     <div className="space-y-8 pb-10">
       
       {/* HEADER SECTION WITH FILTERS & EXPORT */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div 
+        data-aos="fade-down" 
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs"
+      >
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             {getDynamicGreeting()}, {user?.name || "Administrator"}
@@ -124,7 +126,6 @@ const AdminDashboard = () => {
         </div>
 
         <div className="flex items-center gap-3 self-start sm:self-auto">
-          {/* Time Range Selector */}
           <div className="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200 text-xs font-semibold">
             {["7d", "30d", "12m"].map((range) => (
               <button
@@ -141,7 +142,6 @@ const AdminDashboard = () => {
             ))}
           </div>
 
-          {/* Export Button */}
           <button 
             onClick={() => alert("Exporting report...")}
             className="hidden md:flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer"
@@ -160,6 +160,8 @@ const AdminDashboard = () => {
             <Link
               key={index}
               to={stat.link}
+              data-aos="fade-up"
+              data-aos-delay={index * 100} // Staggered animation effect
               className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-slate-300 shadow-xs hover:shadow-md transition-all duration-200 group flex flex-col justify-between"
             >
               <div className="flex items-center justify-between">
@@ -196,7 +198,10 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Appointment Pipeline Status Cards */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col justify-between">
+        <div 
+          data-aos="fade-right" 
+          className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col justify-between"
+        >
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-base font-bold text-slate-900">Appointment Analytics</h2>
@@ -211,10 +216,10 @@ const AdminDashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            
-            {/* Pending */}
             <Link
               to="/admin/appointments/pending"
+              data-aos="fade-up"
+              data-aos-delay="0"
               className="bg-amber-50/60 hover:bg-amber-100/60 border border-amber-200/60 transition p-4 rounded-xl block group"
             >
               <div className="flex items-center justify-between text-amber-800 mb-2">
@@ -227,9 +232,10 @@ const AdminDashboard = () => {
               <p className="text-[11px] text-amber-600/80 mt-1">Awaiting approval</p>
             </Link>
 
-            {/* Confirmed */}
             <Link
               to="/admin/appointments"
+              data-aos="fade-up"
+              data-aos-delay="100"
               className="bg-blue-50/60 hover:bg-blue-100/60 border border-blue-200/60 transition p-4 rounded-xl block group"
             >
               <div className="flex items-center justify-between text-blue-800 mb-2">
@@ -242,9 +248,10 @@ const AdminDashboard = () => {
               <p className="text-[11px] text-blue-600/80 mt-1">Scheduled visits</p>
             </Link>
 
-            {/* Completed */}
             <Link
               to="/admin/appointments"
+              data-aos="fade-up"
+              data-aos-delay="200"
               className="bg-emerald-50/60 hover:bg-emerald-100/60 border border-emerald-200/60 transition p-4 rounded-xl block group"
             >
               <div className="flex items-center justify-between text-emerald-800 mb-2">
@@ -256,13 +263,13 @@ const AdminDashboard = () => {
               </p>
               <p className="text-[11px] text-emerald-600/80 mt-1">Successfully treated</p>
             </Link>
-
           </div>
         </div>
 
         {/* Cancelled Metrics Card */}
         <Link
           to="/admin/appointments"
+          data-aos="fade-left"
           className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 hover:border-slate-300 transition flex flex-col justify-between group"
         >
           <div>
