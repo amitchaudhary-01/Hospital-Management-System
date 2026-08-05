@@ -47,7 +47,7 @@ const PatientHome = () => {
   return (
     <div className="space-y-8">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600 to-indigo-700 text-white p-8 md:p-10 shadow-lg shadow-sky-600/10">
+      <div data-aos="fade-down" className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600 to-indigo-700 text-white p-8 md:p-10 shadow-lg shadow-sky-600/10">
         <div className="relative z-10 max-w-2xl space-y-3">
           <span className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-sky-100 border border-white/20">
             Healthcare Dashboard
@@ -67,6 +67,8 @@ const PatientHome = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div
           onClick={() => navigate("/patient/appointments")}
+          data-aos="fade-up"
+          data-aos-delay="0"
           className="group bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-sky-300 transition-all duration-300 cursor-pointer flex items-start gap-5"
         >
           <div className="w-12 h-12 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 text-xl font-bold group-hover:bg-sky-600 group-hover:text-white transition-colors shrink-0">
@@ -90,6 +92,8 @@ const PatientHome = () => {
             const element = document.getElementById("explore-doctors");
             element?.scrollIntoView({ behavior: "smooth" });
           }}
+          data-aos="fade-up"
+          data-aos-delay="100"
           className="group bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-emerald-300 transition-all duration-300 cursor-pointer flex items-start gap-5"
         >
           <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-xl font-bold group-hover:bg-emerald-600 group-hover:text-white transition-colors shrink-0">
@@ -116,7 +120,7 @@ const PatientHome = () => {
       </div>
 
       {/* Doctor Directory Section */}
-      <section id="explore-doctors" className="space-y-6 pt-4 scroll-mt-20">
+      <section id="explore-doctors" className="space-y-6 pt-4 scroll-mt-20" data-aos="fade-up" data-aos-delay="150">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -157,14 +161,14 @@ const PatientHome = () => {
 
         {/* Error State */}
         {error && (
-          <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 p-4 rounded-xl flex items-center gap-2">
+          <div data-aos="fade-in" className="text-xs text-rose-700 bg-rose-50 border border-rose-200 p-4 rounded-xl flex items-center gap-2">
             <span>⚠️</span> {error}
           </div>
         )}
 
         {/* Empty State */}
         {!loading && !error && filteredDoctors.length === 0 && (
-          <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl shadow-xs">
+          <div data-aos="fade-in" className="text-center py-12 bg-white border border-slate-200 rounded-2xl shadow-xs">
             <p className="text-sm font-semibold text-slate-700">No doctors found</p>
             <p className="text-xs text-slate-400 mt-1">Try adjusting your search criteria or clear the search field.</p>
           </div>
@@ -191,9 +195,11 @@ const PatientHome = () => {
           {/* Rendered Doctor Cards */}
           {!loading &&
             !error &&
-            filteredDoctors.map((doc) => (
+            filteredDoctors.map((doc, index) => (
               <div
                 key={doc._id}
+                data-aos="fade-up"
+                data-aos-delay={index * 50}
                 className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs hover:shadow-lg hover:border-sky-300 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div className="space-y-3">

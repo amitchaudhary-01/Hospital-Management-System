@@ -84,7 +84,7 @@ const DashboardLayout = () => {
       >
         <div className="space-y-6">
           {/* Logo / Header */}
-          <div className="flex items-center justify-between px-2 pt-1">
+          <div className="flex items-center justify-between px-2 pt-1" data-aos="fade-down">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
                 <Stethoscope className="w-5 h-5" />
@@ -111,7 +111,7 @@ const DashboardLayout = () => {
           <div className="h-px bg-slate-200" />
 
           {/* Nav Items */}
-          <nav className="flex flex-col gap-1.5">
+          <nav className="flex flex-col gap-1.5" data-aos="fade-right" data-aos-delay="100">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -137,7 +137,7 @@ const DashboardLayout = () => {
         </div>
 
         {/* User Info & Logout Section */}
-        <div className="pt-4 border-t border-slate-200 space-y-3">
+        <div className="pt-4 border-t border-slate-200 space-y-3" data-aos="fade-up" data-aos-delay="200">
           <button
             onClick={handleLogout}
             className="w-full px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-semibold tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer group"
@@ -149,7 +149,7 @@ const DashboardLayout = () => {
       </aside>
 
       {/* Main Content View */}
-      <main className="flex-1 min-w-0 bg-slate-50 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+      <main className="flex-1 min-w-0 bg-slate-50 p-4 sm:p-6 lg:p-8 overflow-y-auto" data-aos="fade-in" data-aos-delay="150">
         <div className="max-w-7xl mx-auto">
           <Outlet />
         </div>

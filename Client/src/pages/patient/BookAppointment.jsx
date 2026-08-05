@@ -82,20 +82,20 @@ const BookAppointment = () => {
 
   return (
     <div className="p-8 max-w-xl mx-auto">
-      <div className="bg-white rounded-xl border border-slate-200 shadow-md p-7">
-        <h2 className="text-2xl font-semibold text-slate-800 mb-5">
+      <div data-aos="fade-up" className="bg-white rounded-xl border border-slate-200 shadow-md p-7">
+        <h2 data-aos="fade-down" className="text-2xl font-semibold text-slate-800 mb-5">
           Book an Appointment
         </h2>
 
         {/* Feedback Messages */}
         {error && (
-          <div className="p-3 bg-red-100 text-red-700 rounded-md mb-4 text-sm font-medium">
+          <div data-aos="fade-in" className="p-3 bg-red-100 text-red-700 rounded-md mb-4 text-sm font-medium">
             {error}
           </div>
         )}
 
         {successMsg && (
-          <div className="p-3 bg-emerald-100 text-emerald-800 rounded-md mb-4 text-sm font-medium">
+          <div data-aos="fade-in" className="p-3 bg-emerald-100 text-emerald-800 rounded-md mb-4 text-sm font-medium">
             {successMsg}
           </div>
         )}

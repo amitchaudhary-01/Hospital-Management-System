@@ -104,9 +104,9 @@ const PatientProfile = () => {
 
   return (
     <div className="p-8 max-w-2xl mx-auto">
-      <div className="bg-white rounded-xl border border-slate-200 shadow-md p-7">
+      <div data-aos="fade-up" className="bg-white rounded-xl border border-slate-200 shadow-md p-7">
         {/* Card Header */}
-        <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+        <div data-aos="fade-down" className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
           <div>
             <h2 className="text-2xl font-semibold text-slate-800">
               Patient Profile

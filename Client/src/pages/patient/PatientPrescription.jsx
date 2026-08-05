@@ -76,7 +76,7 @@ const PatientPrescription = () => {
   return (
     <div className="p-4 sm:p-6 space-y-6">
       {/* Header */}
-      <div>
+      <div data-aos="fade-down">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-sky-100 rounded-xl">
             <FileText className="w-6 h-6 text-sky-600" />
@@ -96,7 +96,7 @@ const PatientPrescription = () => {
 
       {/* No Prescription */}
       {prescriptions.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center shadow-sm">
+        <div data-aos="fade-in" className="bg-white border border-slate-200 rounded-2xl p-10 text-center shadow-sm">
           <AlertCircle className="w-10 h-10 text-slate-400 mx-auto mb-3" />
 
           <h2 className="text-lg font-bold text-slate-800">
@@ -109,9 +109,11 @@ const PatientPrescription = () => {
         </div>
       ) : (
         <div className="grid gap-5">
-          {prescriptions.map((prescription) => (
+          {prescriptions.map((prescription, index) => (
             <div
               key={prescription._id}
+              data-aos="fade-up"
+              data-aos-delay={index * 50}
               className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden"
             >
               {/* Prescription Header */}
@@ -245,7 +247,7 @@ const PatientPrescription = () => {
           ))}
 
           {/* Reusable Pagination Component Container */}
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-4">
+          <div data-aos="fade-up" className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-4">
             <Pagination
               currentPage={currentPage}
               totalPages={pagination.totalPages}

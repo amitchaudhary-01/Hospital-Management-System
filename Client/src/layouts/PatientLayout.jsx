@@ -74,7 +74,7 @@ const PatientLayout = () => {
         {/* TOP SECTION: LOGO & NAV LINKS */}
         <div className="flex flex-col">
           {/* Logo Brand Header */}
-          <div className="h-16 px-5 flex items-center border-b border-slate-200 shrink-0 sticky top-0 bg-white z-10">
+          <div className="h-16 px-5 flex items-center border-b border-slate-200 shrink-0 sticky top-0 bg-white z-10" data-aos="fade-down">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-400 flex items-center justify-center font-black text-white shadow-sm">
                 HC
@@ -91,7 +91,7 @@ const PatientLayout = () => {
           </div>
 
           {/* Navigation Links */}
-          <nav className="p-3 space-y-1">
+          <nav className="p-3 space-y-1" data-aos="fade-right" data-aos-delay="100">
             <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2">
               Main Menu
             </p>
@@ -116,7 +116,7 @@ const PatientLayout = () => {
         </div>
 
         {/* BOTTOM SECTION: USER PROFILE & LOGOUT */}
-        <div className="p-3 border-t border-slate-200 bg-white shrink-0 space-y-2 mt-auto sticky bottom-0 z-10">
+        <div className="p-3 border-t border-slate-200 bg-white shrink-0 space-y-2 mt-auto sticky bottom-0 z-10" data-aos="fade-up" data-aos-delay="200">
           <NavLink
             to="/patient/profile"
             onClick={() => setIsMobileMenuOpen(false)}
@@ -162,7 +162,7 @@ const PatientLayout = () => {
           </div>
         </header>
 
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto bg-slate-50">
+        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto bg-slate-50" data-aos="fade-in" data-aos-delay="150">
           <Outlet />
         </main>
       </div>
