@@ -12,7 +12,7 @@ const createAdmin = async () => {
 
         // Check if admin already exists
         const adminExists = await User.findOne({
-            email: "amitchaudhary@gmail.com",
+            email: process.env.ADMIN_EMAIL,
         });
 
         if (adminExists) {
@@ -21,12 +21,12 @@ const createAdmin = async () => {
         }
 
         // Hash password
-        const hashedPassword = await bcrypt.hash("amitchaudharyproject", 10);
+        const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
 
         // Create admin
         await User.create({
             name: "Adminamit",
-            email: "amitchaudhary@gmail.com",
+            email: process.env.ADMIN_EMAIL,
             password: hashedPassword,
             role: "admin",
             contactNumber: "9821005569",
