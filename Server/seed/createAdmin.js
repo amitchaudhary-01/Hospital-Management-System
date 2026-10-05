@@ -29,8 +29,8 @@ const createAdmin = async () => {
             email: process.env.ADMIN_EMAIL,
             password: hashedPassword,
             role: "admin",
-            contactNumber: "9821005569",
-            address: "Nawalparasi",
+            contactNumber: process.env.ADMIN_NUMBER,
+            address: process.env.ADMIN_ADDRESS,
         });
 
         console.log("Admin created successfully.");
